@@ -26,11 +26,16 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.ipc.ClientId;
 import org.apache.hadoop.ipc.RPC.RpcKind;
 import org.apache.hadoop.ipc.RpcConstants;
+import org.apache.hadoop.ipc.protobuf.IpcConnectionContextProtos;
 import org.apache.hadoop.ipc.protobuf.RpcHeaderProtos.RpcRequestHeaderProto;
 import org.apache.hadoop.ipc.protobuf.RpcHeaderProtos.RpcRequestHeaderProto.OperationProto;
+import org.apache.hadoop.security.SaslRpcServer;
+import org.apache.hadoop.security.UserGroupInformation;
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.google.protobuf.CodedOutputStream;
@@ -84,5 +89,20 @@ public class TestProtoUtil {
         RpcKind.RPC_PROTOCOL_BUFFER, OperationProto.RPC_FINAL_PACKET, 0,
         RpcConstants.INVALID_RETRY_COUNT, uuid);
     assertTrue(Arrays.equals(uuid, header.getClientId().toByteArray()));
+  }
+
+  @Test
+  public void testUgiProto() throws IOException {
+
+    System.setProperty("HADOOP_USER_PASSWD", "xxxxxx");
+    UserGroupInformation ugi = UserGroupInformation.getLoginUser();
+
+    IpcConnectionContextProtos.IpcConnectionContextProto proto =
+            ProtoUtil.makeIpcConnectionContext(null, ugi, SaslRpcServer.AuthMethod.SIMPLE);
+
+    UserGroupInformation newugi = ProtoUtil.getUgi(proto);
+    Assert.assertEquals("xxxxxx", newugi.getUserPassword());
+
+
   }
 }
