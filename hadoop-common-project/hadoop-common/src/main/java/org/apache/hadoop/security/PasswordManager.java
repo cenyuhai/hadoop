@@ -36,12 +36,29 @@ public class PasswordManager {
   // Format4 - username without password and disabled
   //    username:null:false
 
-  private volatile Map<String, String> user2Passwd = Collections.unmodifiableMap(new HashMap<String, String>());
-  private volatile Map<String, Boolean> user2Switch = Collections.unmodifiableMap(new HashMap<String, Boolean>());
+  private volatile Map<String, PasswordItem> user2Passwd = Collections.unmodifiableMap(new HashMap<String, PasswordItem>());
 
 
   // enable password check or not
   private volatile boolean enablePassword = false;
+
+  class PasswordItem {
+    private String digest;
+    private boolean enable;
+
+    PasswordItem(String digest, boolean enable) {
+      this.digest = digest;
+      this.enable = enable;
+    }
+
+    public String getDigest() {
+      return digest;
+    }
+
+    public boolean isEnable() {
+      return enable;
+    }
+  }
 
   public void init() throws IOException {
 
@@ -71,17 +88,17 @@ public class PasswordManager {
       return;
     }
 
-    Boolean _switch = this.user2Switch.get(userName);
-    if (_switch == null) {
+    PasswordItem item = this.user2Passwd.get(userName);
+    if (item == null) {
       throw new AccessControlException(userName + " not exists.");
     }
 
-    if (!_switch.booleanValue()) {
+    if (!item.isEnable()) {
       return;
     }
 
-    String passwdDigest = this.user2Passwd.get(userName);
-    if (passwdDigest == null || passwdDigest.isEmpty()) {
+    String digest = item.getDigest();
+    if (digest == null || digest.isEmpty()) {
       throw new AccessControlException(userName + "'s password not set.");
     }
 
@@ -90,7 +107,7 @@ public class PasswordManager {
     }
 
     String digest2Check = MD5Digest(password);
-    if (!passwdDigest.equals(digest2Check)) {
+    if (!digest.equals(digest2Check)) {
       throw new AccessControlException(userName + "'s password is wrong.");
     }
 
@@ -140,8 +157,7 @@ public class PasswordManager {
     }
 
     // new map
-    Map<String, String> newUser2Passwd = new HashMap<>();
-    Map<String, Boolean> newUser2Switch = new HashMap<>();
+    Map<String, PasswordItem> newUser2Passwd = new HashMap<>();
 
     LOG.info("Loading " + filename);
     try (BufferedReader reader = new BufferedReader(
@@ -161,20 +177,20 @@ public class PasswordManager {
         }
 
         // parse username and password
+        String password = null;
         if (parts[1] != null && !parts[1].endsWith(EMPTY_PASSWORD)) {
-          newUser2Passwd.put(parts[0], parts[1]);
+          password = parts[1];
         }
 
         // parse username and switch
-        boolean _switch = Boolean.parseBoolean(parts[2]);
-        newUser2Switch.put(parts[0], _switch);
+        boolean enable = Boolean.parseBoolean(parts[2]);
+        newUser2Passwd.put(parts[0], new PasswordItem(password, enable));
       }
     }
     LOG.info("Loaded " + filename);
 
     // change reference
     this.user2Passwd = Collections.unmodifiableMap(newUser2Passwd);
-    this.user2Switch = Collections.unmodifiableMap(newUser2Switch);
   }
 
 
