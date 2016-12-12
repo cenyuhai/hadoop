@@ -81,7 +81,7 @@ public class UserGroupInformation {
   static final String HADOOP_USER_NAME = "HADOOP_USER_NAME";
   static final String HADOOP_PROXY_USER = "HADOOP_PROXY_USER";
 
-  static final String HADOOP_USER_PASSWD = "HADOOP_USER_PASSWD";
+  static final String HADOOP_USER_PASSWD = "HADOOP_USER_PASSWORD";
   static final String HADOOP_USER_PASSWD_KEY = "hadoop.user.password";
 
   /**
