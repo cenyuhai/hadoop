@@ -42,6 +42,19 @@ public class PasswordManager {
   // enable password check or not
   private volatile boolean enablePassword = false;
 
+  private static PasswordManager instance = null; // Singleton
+
+  private PasswordManager() {}
+
+  public static PasswordManager getInstance() {
+    if (instance == null) {
+      instance = new PasswordManager();
+    }
+
+    return instance;
+  }
+
+
   class PasswordItem {
     private String digest;
     private boolean enable;
