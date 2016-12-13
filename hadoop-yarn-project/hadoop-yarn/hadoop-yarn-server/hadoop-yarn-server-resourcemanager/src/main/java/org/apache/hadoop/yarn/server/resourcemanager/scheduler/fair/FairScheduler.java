@@ -575,7 +575,17 @@ public class FairScheduler extends
    * configured limits, but the app will not be marked as runnable.
    */
   protected synchronized void addApplication(ApplicationId applicationId,
-      String queueName, String user, boolean isAppRecovering) {
+                                             String queueName, String user, boolean isAppRecovering) {
+    addApplication(applicationId, queueName, user, null, isAppRecovering);
+  }
+
+  /**
+   * Add a new application to the scheduler, with a given id, queue name, and
+   * user and user's password. This will accept a new app even if the user or queue is above
+   * configured limits, but the app will not be marked as runnable.
+   */
+  protected synchronized void addApplication(ApplicationId applicationId,
+      String queueName, String user, String userPassword, boolean isAppRecovering) {
     if (queueName == null || queueName.isEmpty()) {
       String message = "Reject application " + applicationId +
               " submitted by user " + user + " with an empty queue name.";
