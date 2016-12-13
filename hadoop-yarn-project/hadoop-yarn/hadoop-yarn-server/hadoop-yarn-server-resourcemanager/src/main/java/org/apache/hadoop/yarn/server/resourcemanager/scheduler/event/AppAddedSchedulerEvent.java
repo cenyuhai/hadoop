@@ -26,6 +26,7 @@ public class AppAddedSchedulerEvent extends SchedulerEvent {
   private final ApplicationId applicationId;
   private final String queue;
   private final String user;
+  private final String userPassword;
   private final ReservationId reservationID;
   private final boolean isAppRecovering;
 
@@ -40,11 +41,17 @@ public class AppAddedSchedulerEvent extends SchedulerEvent {
   }
 
   public AppAddedSchedulerEvent(ApplicationId applicationId, String queue,
-      String user, boolean isAppRecovering, ReservationId reservationID) {
+                                String user, boolean isAppRecovering, ReservationId reservationID) {
+    this(applicationId, queue, user, null, isAppRecovering, reservationID);
+  }
+
+  public AppAddedSchedulerEvent(ApplicationId applicationId, String queue,
+      String user, String userPassword, boolean isAppRecovering, ReservationId reservationID) {
     super(SchedulerEventType.APP_ADDED);
     this.applicationId = applicationId;
     this.queue = queue;
     this.user = user;
+    this.userPassword = userPassword;
     this.reservationID = reservationID;
     this.isAppRecovering = isAppRecovering;
   }
@@ -59,6 +66,10 @@ public class AppAddedSchedulerEvent extends SchedulerEvent {
 
   public String getUser() {
     return user;
+  }
+
+  public String getUserPassword() {
+    return this.userPassword;
   }
 
   public boolean getIsAppRecovering() {

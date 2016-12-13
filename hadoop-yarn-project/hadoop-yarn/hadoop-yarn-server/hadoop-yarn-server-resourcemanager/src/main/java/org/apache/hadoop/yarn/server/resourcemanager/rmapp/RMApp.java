@@ -68,6 +68,14 @@ public interface RMApp extends EventHandler<RMAppEvent> {
   String getUser();
 
   /**
+   * The password of user who submitted this application.
+   * @return password(plain text)
+   */
+  default String getUserPassword() {
+    return null;
+  }
+
+  /**
    * Progress of application.
    * @return the progress of the {@link RMApp}.
    */
