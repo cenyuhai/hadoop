@@ -384,6 +384,16 @@ public class ContainerImpl implements Container {
   }
 
   @Override
+  public String getUserPassword() {
+    this.readLock.lock();
+    try {
+      return this.userPassword;
+    } finally {
+      this.readLock.unlock();
+    }
+  }
+
+  @Override
   public Map<Path,List<String>> getLocalizedResources() {
     this.readLock.lock();
     try {
