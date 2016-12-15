@@ -145,7 +145,7 @@ public class ContainerImpl implements Container {
     this.credentials = creds;
     this.metrics = metrics;
     user = containerTokenIdentifier.getApplicationSubmitter();
-    userPassword = containerTokenIdentifier.getApplicationSubmitter();
+    userPassword = containerTokenIdentifier.getApplicationsSubmitterPassword();
     ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
     this.readLock = readWriteLock.readLock();
     this.writeLock = readWriteLock.writeLock();

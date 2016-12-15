@@ -126,6 +126,10 @@ public class ContainerTokenIdentifier extends TokenIdentifier {
     return proto.getAppSubmitter();
   }
 
+  public String getApplicationsSubmitterPassword() {
+    return proto.getAppSubmitterPassword();
+  }
+
   public String getNmHostAddress() {
     return proto.getNmHostAddr();
   }
