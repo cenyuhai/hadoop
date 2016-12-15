@@ -197,6 +197,26 @@ public class RMContainerTokenSecretManager extends
   public Token createContainerToken(ContainerId containerId, NodeId nodeId,
       String appSubmitter, Resource capability, Priority priority,
       long createTime, LogAggregationContext logAggregationContext) {
+    return createContainerToken(containerId, nodeId, appSubmitter, null, capability,
+            priority, createTime, logAggregationContext);
+  }
+
+  /**
+   * Helper function for creating ContainerTokens
+   *
+   * @param containerId
+   * @param nodeId
+   * @param appSubmitter
+   * @param appSubmitterPassword
+   * @param capability
+   * @param priority
+   * @param createTime
+   * @param logAggregationContext
+   * @return the container-token
+   */
+  public Token createContainerToken(ContainerId containerId, NodeId nodeId,
+      String appSubmitter, String appSubmitterPassword, Resource capability, Priority priority,
+      long createTime, LogAggregationContext logAggregationContext) {
     byte[] password;
     ContainerTokenIdentifier tokenIdentifier;
     long expiryTimeStamp =
@@ -207,7 +227,7 @@ public class RMContainerTokenSecretManager extends
     try {
       tokenIdentifier =
           new ContainerTokenIdentifier(containerId, nodeId.toString(),
-            appSubmitter, capability, expiryTimeStamp, this.currentMasterKey
+            appSubmitter, appSubmitterPassword, capability, expiryTimeStamp, this.currentMasterKey
               .getMasterKey().getKeyId(),
             ResourceManager.getClusterTimeStamp(), priority, createTime,
             logAggregationContext);

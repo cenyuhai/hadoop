@@ -665,10 +665,11 @@ public class FairScheduler extends
        return ;
     }
     String user = application.getUser();
+    String userPassword = application.getUserPassword();
     FSLeafQueue queue = (FSLeafQueue) application.getQueue();
 
     FSAppAttempt attempt =
-        new FSAppAttempt(this, applicationAttemptId, user,
+        new FSAppAttempt(this, applicationAttemptId, user, userPassword,
             queue, application.getPriority(),
             new ActiveUsersManager(getRootQueueMetrics()), rmContext);
     if (transferStateFromPreviousAttempt) {

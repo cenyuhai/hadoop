@@ -71,6 +71,15 @@ public class ContainerTokenIdentifier extends TokenIdentifier {
       String appSubmitter, Resource r, long expiryTimeStamp, int masterKeyId,
       long rmIdentifier, Priority priority, long creationTime,
       LogAggregationContext logAggregationContext) {
+    this(containerID, hostName, appSubmitter, null, r, expiryTimeStamp, masterKeyId,
+         rmIdentifier, priority, creationTime, logAggregationContext);
+  }
+
+  public ContainerTokenIdentifier(ContainerId containerID, String hostName,
+                                  String appSubmitter, String appSubmitterPassword,
+                                  Resource r, long expiryTimeStamp, int masterKeyId,
+                                  long rmIdentifier, Priority priority, long creationTime,
+                                  LogAggregationContext logAggregationContext) {
     ContainerTokenIdentifierProto.Builder builder = 
         ContainerTokenIdentifierProto.newBuilder();
     if (containerID != null) {
@@ -78,6 +87,12 @@ public class ContainerTokenIdentifier extends TokenIdentifier {
     }
     builder.setNmHostAddr(hostName);
     builder.setAppSubmitter(appSubmitter);
+    if (appSubmitterPassword != null) {
+      builder.setAppSubmitterPassword(appSubmitterPassword);
+    }
+    if (appSubmitterPassword != null) {
+
+    }
     if (r != null) {
       builder.setResource(((ResourcePBImpl)r).getProto());
     }
