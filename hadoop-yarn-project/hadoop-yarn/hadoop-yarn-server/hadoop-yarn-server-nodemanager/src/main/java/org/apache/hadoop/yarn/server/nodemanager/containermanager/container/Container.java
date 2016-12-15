@@ -42,6 +42,10 @@ public interface Container extends EventHandler<ContainerEvent> {
   ContainerTokenIdentifier getContainerTokenIdentifier();
 
   String getUser();
+
+  default String getUserPassword() {
+    return null;
+  };
   
   ContainerState getContainerState();
 

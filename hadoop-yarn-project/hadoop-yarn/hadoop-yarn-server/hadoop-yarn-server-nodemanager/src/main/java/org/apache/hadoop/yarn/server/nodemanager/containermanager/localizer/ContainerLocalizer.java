@@ -80,6 +80,7 @@ public class ContainerLocalizer {
       new FsPermission((short)0710);
 
   private final String user;
+  private final String userPassword;
   private final String appId;
   private final List<Path> localDirs;
   private final String localizerId;
@@ -92,6 +93,12 @@ public class ContainerLocalizer {
   public ContainerLocalizer(FileContext lfs, String user, String appId,
       String localizerId, List<Path> localDirs,
       RecordFactory recordFactory) throws IOException {
+    this(lfs, user, null, appId, localizerId, localDirs, recordFactory);
+  }
+
+  public ContainerLocalizer(FileContext lfs, String user, String userPassword, String appId,
+                            String localizerId, List<Path> localDirs,
+                            RecordFactory recordFactory) throws IOException {
     if (null == user) {
       throw new IOException("Cannot initialize for null user");
     }
@@ -100,6 +107,7 @@ public class ContainerLocalizer {
     }
     this.lfs = lfs;
     this.user = user;
+    this.userPassword = userPassword;
     this.appId = appId;
     this.localDirs = localDirs;
     this.localizerId = localizerId;
@@ -138,7 +146,7 @@ public class ContainerLocalizer {
     }
     // create localizer context
     UserGroupInformation remoteUser =
-      UserGroupInformation.createRemoteUser(user);
+      UserGroupInformation.createRemoteUser(user, userPassword);
     remoteUser.addToken(creds.getToken(LocalizerTokenIdentifier.KIND));
     final LocalizationProtocol nodeManager =
         remoteUser.doAs(new PrivilegedAction<LocalizationProtocol>() {
@@ -150,7 +158,7 @@ public class ContainerLocalizer {
 
     // create user context
     UserGroupInformation ugi =
-      UserGroupInformation.createRemoteUser(user);
+      UserGroupInformation.createRemoteUser(user, userPassword);
     for (Token<? extends TokenIdentifier> token : creds.getAllTokens()) {
       ugi.addToken(token);
     }
