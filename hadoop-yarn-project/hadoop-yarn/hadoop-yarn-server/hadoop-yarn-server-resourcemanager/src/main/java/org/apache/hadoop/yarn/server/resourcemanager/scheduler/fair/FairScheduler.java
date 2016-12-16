@@ -633,7 +633,7 @@ public class FairScheduler extends
     }
   
     SchedulerApplication<FSAppAttempt> application =
-        new SchedulerApplication<FSAppAttempt>(queue, user, 
+        new SchedulerApplication<FSAppAttempt>(queue, user, userPassword,
               rmApp.getApplicationSubmissionContext().getPriority());
     applications.put(applicationId, application);
     queue.getMetrics().submitApp(user);
@@ -667,6 +667,7 @@ public class FairScheduler extends
     String user = application.getUser();
     String userPassword = application.getUserPassword();
     FSLeafQueue queue = (FSLeafQueue) application.getQueue();
+
 
     FSAppAttempt attempt =
         new FSAppAttempt(this, applicationAttemptId, user, userPassword,
@@ -1232,7 +1233,7 @@ public class FairScheduler extends
               appAddedEvent.getReservationID());
       if (queueName != null) {
         addApplication(appAddedEvent.getApplicationId(),
-            queueName, appAddedEvent.getUser(),
+            queueName, appAddedEvent.getUser(), appAddedEvent.getUserPassword(),
             appAddedEvent.getIsAppRecovering());
       }
       break;
