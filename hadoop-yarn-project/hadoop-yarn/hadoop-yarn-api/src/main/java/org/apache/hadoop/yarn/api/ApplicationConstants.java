@@ -116,6 +116,12 @@ public interface ApplicationConstants {
      * Final, non-modifiable.
      */
     USER("USER"),
+
+    /**
+     * $USER_PASSWORD
+     * Final, non-modifiable.
+     */
+    USER_PASSWORD("USER_PASSWORD"),
     
     /**
      * $LOGNAME

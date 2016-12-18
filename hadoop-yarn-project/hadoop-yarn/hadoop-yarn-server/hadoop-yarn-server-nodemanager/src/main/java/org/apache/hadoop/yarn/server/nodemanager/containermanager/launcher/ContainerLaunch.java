@@ -684,6 +684,8 @@ public class ContainerLaunch implements Callable<Integer> {
       StringUtils.join(",", containerLogDirs));
 
     environment.put(Environment.USER.name(), container.getUser());
+
+    environment.put(Environment.USER_PASSWORD.name(), container.getUserPassword());
     
     environment.put(Environment.LOGNAME.name(), container.getUser());
 
