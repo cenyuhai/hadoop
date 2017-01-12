@@ -109,8 +109,8 @@ public abstract class ReconfigurableBase
     // See {@link ReconfigurationServlet#applyChanges}
     public void run() {
       do {
+        LOG.info("Starting reconfiguration task.");
         try {
-          LOG.info("Starting reconfiguration task.");
           Configuration oldConf = this.parent.getConf();
           Configuration newConf = new Configuration();
           Collection<PropertyChange> changes =

@@ -17,6 +17,8 @@
  */
 package org.apache.hadoop.hdfs.server.blockmanagement;
 
+import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_HEARTBEAT_EXPIRE_INTERVAL_DEFAULT;
+import static org.apache.hadoop.hdfs.DFSConfigKeys.DFS_HEARTBEAT_EXPIRE_INTERVAL_KEY;
 import static org.apache.hadoop.util.Time.monotonicNow;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -108,7 +110,12 @@ public class DatanodeManager {
   private final HostFileManager hostFileManager = new HostFileManager();
 
   /** The period to wait for datanode heartbeat.*/
-  private long heartbeatExpireInterval;
+  private volatile long heartbeatExpireInterval;
+
+  /** Used to recompute heartbeatExpireInterval after NameNode upgrade. */
+  private final long heartbeatIntervalSeconds;
+  private final int heartbeatRecheckInterval;
+
   /** Ask Datanode only up to this many blocks to delete. */
   final int blockInvalidateLimit;
 
@@ -224,14 +231,16 @@ public class DatanodeManager {
       dnsToSwitchMapping.resolve(locations);
     }
 
-    final long heartbeatIntervalSeconds = conf.getLong(
+    this.heartbeatIntervalSeconds = conf.getLong(
         DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_KEY,
         DFSConfigKeys.DFS_HEARTBEAT_INTERVAL_DEFAULT);
-    final int heartbeatRecheckInterval = conf.getInt(
+    this.heartbeatRecheckInterval = conf.getInt(
         DFSConfigKeys.DFS_NAMENODE_HEARTBEAT_RECHECK_INTERVAL_KEY, 
         DFSConfigKeys.DFS_NAMENODE_HEARTBEAT_RECHECK_INTERVAL_DEFAULT); // 5 minutes
-    this.heartbeatExpireInterval = 2 * heartbeatRecheckInterval
-        + 10 * 1000 * heartbeatIntervalSeconds;
+    final long expireMs = conf.getLong(DFS_HEARTBEAT_EXPIRE_INTERVAL_KEY,
+            DFS_HEARTBEAT_EXPIRE_INTERVAL_DEFAULT); // default invalid
+    setHeartbeatExpireInterval(expireMs);
+
     final int blockInvalidateLimit = Math.max(20*(int)(heartbeatIntervalSeconds),
         DFSConfigKeys.DFS_BLOCK_INVALIDATE_LIMIT_DEFAULT);
     this.blockInvalidateLimit = conf.getInt(
@@ -335,9 +344,18 @@ public class DatanodeManager {
     return hostFileManager;
   }
 
-  @VisibleForTesting
   public void setHeartbeatExpireInterval(long expiryMs) {
-    this.heartbeatExpireInterval = expiryMs;
+    if (expiryMs == DFS_HEARTBEAT_EXPIRE_INTERVAL_DEFAULT) {
+      this.heartbeatExpireInterval = 2 * heartbeatRecheckInterval
+              + 10 * 1000 * heartbeatIntervalSeconds;
+    } else {
+      this.heartbeatExpireInterval = expiryMs;
+    }
+  }
+
+  @VisibleForTesting
+  public long getHeartbeatExpireInterval() {
+    return this.heartbeatExpireInterval;
   }
 
   @VisibleForTesting
