@@ -149,8 +149,12 @@ public class NameNode extends ReconfigurableBase implements NameNodeStatusMXBean
   @Override
   protected void reconfigurePropertyImpl(String property, String newVal)
       throws ReconfigurationException {
-      if (newVal == null) newVal = "";
-      conf.set(property, newVal);
+      if (newVal == null) {
+        conf.unset(property);
+      } else {
+        conf.set(property, newVal);
+      }
+
       switch (property) {
         case FS_PROTECTED_DIRECTORIES:
           namesystem.getFSDirectory().setProtectedDirectories(conf);
@@ -163,7 +167,7 @@ public class NameNode extends ReconfigurableBase implements NameNodeStatusMXBean
           rpcServer.refreshWhiteList(conf);
         case DFS_HEARTBEAT_EXPIRE_INTERVAL_KEY:
           long expireMS = DFS_HEARTBEAT_EXPIRE_INTERVAL_DEFAULT;
-          if (!newVal.isEmpty()) {
+          if (newVal != null && !newVal.isEmpty()) {
             expireMS = Long.parseLong(newVal);
           }
           namesystem.getBlockManager().getDatanodeManager().setHeartbeatExpireInterval(expireMS);
