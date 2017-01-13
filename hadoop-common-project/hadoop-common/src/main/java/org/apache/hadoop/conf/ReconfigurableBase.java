@@ -108,8 +108,8 @@ public abstract class ReconfigurableBase
 
     // See {@link ReconfigurationServlet#applyChanges}
     public void run() {
+      LOG.info("Starting reconfiguration task.");
       do {
-        LOG.info("Starting reconfiguration task.");
         try {
           Configuration oldConf = this.parent.getConf();
           Configuration newConf = new Configuration();

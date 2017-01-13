@@ -351,6 +351,7 @@ public class DatanodeManager {
     } else {
       this.heartbeatExpireInterval = expiryMs;
     }
+    LOG.info("set heartbeat expire interval to " + this.heartbeatExpireInterval);
   }
 
   @VisibleForTesting
