@@ -216,12 +216,10 @@ class NameNodeRpcServer implements NamenodeProtocols {
   protected final InetSocketAddress clientRpcAddress;
   
   private final String minimumDataNodeVersion;
-  private final WhiteList whiteList;
 
   public NameNodeRpcServer(Configuration conf, NameNode nn)
       throws IOException {
     this.nn = nn;
-    this.whiteList = nn.whiteList;
     this.namesystem = nn.getNamesystem();
     this.retryCache = namesystem.getRetryCache();
     this.metrics = NameNode.getNameNodeMetrics();
@@ -352,7 +350,6 @@ class NameNodeRpcServer implements NamenodeProtocols {
         .setPort(rpcAddr.getPort()).setNumHandlers(handlerCount)
         .setVerbose(false)
         .setSecretManager(namesystem.getDelegationTokenSecretManager()).build();
-    this.clientRpcServer.setWhiteList(whiteList);
 
     // Add all the RPC protocols that the namenode implements
     DFSUtil.addPBProtocol(conf, HAServiceProtocolPB.class, haPbService,
@@ -458,13 +455,6 @@ class NameNodeRpcServer implements NamenodeProtocols {
     if (serviceRpcServer != null) {
       serviceRpcServer.stop();
     }
-    if (whiteList != null) {
-      whiteList.close();
-    }
-  }
-
-  public void refreshWhiteList(Configuration conf) {
-      whiteList.refresh(conf);
   }
   
   InetSocketAddress getServiceRpcAddress() {
