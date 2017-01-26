@@ -20,10 +20,16 @@ package org.apache.hadoop.security;
 import java.io.*;
 import java.util.*;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.ipc.RefreshHandler;
+import org.apache.hadoop.ipc.RefreshRegistry;
+import org.apache.hadoop.ipc.RefreshResponse;
 import org.apache.hadoop.security.authorize.AuthorizationException;
 import org.apache.hadoop.util.StringUtils;
 
@@ -32,7 +38,7 @@ import static org.apache.hadoop.fs.CommonConfigurationKeysPublic.HADOOP_SECURITY
 /**
  * Management the mapping from ip address to hadoop's username.
  */
-public class WhiteList {
+public class WhiteList implements RefreshHandler {
 
   private static final Log LOG = LogFactory.getLog(WhiteList.class);
 
@@ -42,37 +48,33 @@ public class WhiteList {
   public static final String HADOOP_SECURITY_VARIABLEWHITELIST_FILE =
           "hadoop.security.variablewhitelist.file";
 
+  private static final String REFRESH_WHITE_LIST_IDENTIFIER = "REFRESH_WHITE_LIST";
+
   private volatile boolean enableWhiteList = false;
 
   // any user can access hdfs from fixed white list's ip address.
   private volatile Set<String> fixedWhiteList = new HashSet<>();
-  private volatile Map<String, Set<String>> ip2users = new HashMap<>();
+  private volatile Multimap<String, String> ip2users = HashMultimap.create();
 
-  protected static WhiteList instance = null;
+  protected static final WhiteList instance = new WhiteList();
+
+  static {
+    RefreshRegistry.defaultRegistry().register(REFRESH_WHITE_LIST_IDENTIFIER, instance);
+  }
 
   protected WhiteList() {
 
+    Configuration conf = new Configuration();
+    // just load configuration and white list.
+    reload(conf);
   }
 
   /**
    * singleton pattern and double checking
    */
   public static WhiteList getInstance() {
-    if (instance == null) {
-      synchronized (WhiteList.class) {
-        if (instance == null) {
-          instance = new WhiteList();
-        }
-      }
-    }
-
     return instance;
   }
-
-  public boolean isEnabled() {
-    return this.enableWhiteList;
-  }
-
 
   /**
    * Check the remote ip and username.
@@ -90,21 +92,23 @@ public class WhiteList {
       return;
     }
 
-    if (!this.ip2users.containsKey(ip)) {
-      throw new AuthorizationException(ip + " not in white list.");
-    } else {
-      Set<String> users = this.ip2users.get(ip);
-      if (!users.contains(username)) {
-        throw new AuthorizationException(username + " from " + ip + " is illegal.");
-      }
+    if (!this.ip2users.containsEntry(ip, username)) {
+      throw new AuthorizationException(username + " from " + ip + " not in white list.");
     }
   }
 
-  public void init() throws IOException {
+  @Override
+  public RefreshResponse handleRefresh(String identifier, String[] args) {
 
-    Configuration conf = new Configuration();
-    // just load configuration and white list.
-    reload(conf);
+    if (identifier.equals(REFRESH_WHITE_LIST_IDENTIFIER)) {
+
+      Configuration conf = new Configuration();
+      reload(conf);
+
+      return RefreshResponse.successResponse();
+    }
+
+    return new RefreshResponse(-1, "Invalid identifier: " + identifier);
   }
 
   /**
@@ -113,7 +117,8 @@ public class WhiteList {
    * @param conf not null
    * @throws IOException load failed
    */
-  private void reload(Configuration conf) throws IOException {
+  @VisibleForTesting
+  public void reload(Configuration conf) {
 
     this.enableWhiteList = conf.getBoolean(HADOOP_SECURITY_USE_WHITELIST, false);
     LOG.info("WhiteList checking enable: " + this.enableWhiteList);
@@ -122,8 +127,13 @@ public class WhiteList {
       return;
     }
 
-    loadFixedWhiteList(conf);
-    loadVariableWhiteList(conf);
+    try {
+      loadFixedWhiteList(conf);
+      loadVariableWhiteList(conf);
+    } catch (IOException e) {
+      LOG.error("Error reloading white list. ", e);
+    }
+
   }
 
   private void loadFixedWhiteList(Configuration conf) throws IOException {
@@ -180,7 +190,7 @@ public class WhiteList {
     }
 
     // new set
-    Map<String, Set<String>> newIp2Users = new HashMap<>();
+    Multimap<String, String> newIp2Users = HashMultimap.create();
     LOG.info("Loading " + variableFile);
     try (BufferedReader reader = new BufferedReader(
             new InputStreamReader(new FileInputStream(file), Charsets.UTF_8))) {
@@ -200,7 +210,7 @@ public class WhiteList {
         }
 
         String users[] = StringUtils.split(parts[1], ',');
-        newIp2Users.put(parts[0], new HashSet<String>(Arrays.asList(users)));
+        newIp2Users.putAll(parts[0], Arrays.asList(users));
       }
     }
 
@@ -209,5 +219,6 @@ public class WhiteList {
     // switch reference
     this.ip2users = newIp2Users;
   }
+
 
 }

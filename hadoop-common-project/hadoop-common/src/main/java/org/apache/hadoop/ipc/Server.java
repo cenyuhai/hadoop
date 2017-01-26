@@ -361,7 +361,6 @@ public abstract class Server {
   private SecretManager<TokenIdentifier> secretManager;
   private SaslPropertiesResolver saslPropsResolver;
   private ServiceAuthorizationManager serviceAuthorizationManager = new ServiceAuthorizationManager();
-  private WhiteList whiteList;
 
   private int maxQueueSize;
   private final int maxRespSize;
@@ -1977,7 +1976,7 @@ public abstract class Server {
       try {
 
         // check white list first
-        whiteList.checkWhiteList(this.getHostAddress(), user.getUserName());
+        WhiteList.getInstance().checkWhiteList(this.getHostAddress(), user.getUserName());
 
         // If auth method is TOKEN, the token was obtained by the
         // real user for the effective user, therefore not required to
@@ -2292,10 +2291,6 @@ public abstract class Server {
     }
     
     this.exceptionsHandler.addTerseExceptions(StandbyException.class);
-
-    // init white list
-    this.whiteList = WhiteList.getInstance();
-    this.whiteList.init();
   }
   
   private RpcSaslProto buildNegotiateResponse(List<AuthMethod> authMethods)
