@@ -200,21 +200,26 @@ public class WhiteList implements RefreshHandler {
             new InputStreamReader(new FileInputStream(file), Charsets.UTF_8))) {
 
       String line;
-      // 127.0.0.1:user1,user2,user3
+      // 127.0.0.1=user1,user2,user3
       while ((line = reader.readLine()) != null) {
 
         if (LOG.isDebugEnabled()) {
           LOG.debug("handle " + line);
         }
 
-        String parts[] = StringUtils.split(line, ':');
-        if (parts.length != 2) {
-          LOG.warn("ignore illegal line: " + line);
+        Collection<String> ipToUsers = StringUtils.getStringCollection(line,
+                "=");
+        if (ipToUsers.size() != 2) {
+          LOG.warn("ignore invalid line: " + line);
           continue;
         }
 
-        String users[] = StringUtils.split(parts[1], ',');
-        newIp2Users.putAll(parts[0], Arrays.asList(users));
+        String[] ipToUsersArray = ipToUsers.toArray(new String[ipToUsers
+                .size()]);
+        String ip = ipToUsersArray[0];
+        Set<String> users = new HashSet<>(StringUtils.getStringCollection(ipToUsersArray[1]));
+
+        newIp2Users.putAll(ip, users);
       }
     }
 
