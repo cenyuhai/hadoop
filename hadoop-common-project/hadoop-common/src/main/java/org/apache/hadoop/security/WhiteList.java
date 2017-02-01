@@ -53,8 +53,8 @@ public class WhiteList implements RefreshHandler {
   private volatile boolean enableWhiteList = false;
 
   // any user can access hdfs from fixed white list's ip address.
-  private volatile Set<String> fixedWhiteList = new HashSet<>();
-  private volatile Multimap<String, String> ip2users = HashMultimap.create();
+  private  Set<String> fixedWhiteList = new HashSet<>();
+  private  Multimap<String, String> ip2users = HashMultimap.create();
 
   protected static final WhiteList instance = new WhiteList();
 
@@ -168,10 +168,14 @@ public class WhiteList implements RefreshHandler {
       }
     }
 
-    LOG.info("Loaded " + fixedFile);
+    LOG.info("Loaded " + newFixedWhiteList.size() + " from " + fixedFile);
 
-    // switch reference
-    this.fixedWhiteList = newFixedWhiteList;
+    if (newFixedWhiteList.size() == 0) {
+      LOG.error("Fixed white list can't be empty. Ignore.");
+    } else {
+      // switch reference
+      this.fixedWhiteList = newFixedWhiteList;
+    }
   }
 
   private void loadVariableWhiteList(Configuration conf) throws IOException {
@@ -214,7 +218,7 @@ public class WhiteList implements RefreshHandler {
       }
     }
 
-    LOG.info("Loaded " + variableFile);
+    LOG.info("Loaded " + newIp2Users.keys().size() + " from " + variableFile);
 
     // switch reference
     this.ip2users = newIp2Users;
