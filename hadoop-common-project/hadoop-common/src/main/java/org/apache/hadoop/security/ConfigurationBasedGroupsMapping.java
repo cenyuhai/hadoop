@@ -118,7 +118,7 @@ public class ConfigurationBasedGroupsMapping
       }
     }
 
-    LOG.info("Loaded " + newUser2groups.size() + " users from " + filename);
+    LOG.info("Loaded " + newUser2groups.keySet().size() + " users from " + filename);
 
     // switch reference
     this.user2groups = newUser2groups;
