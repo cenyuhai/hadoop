@@ -160,7 +160,6 @@ public class NameNode extends ReconfigurableBase implements NameNodeStatusMXBean
           namesystem.getFSDirectory().setProtectedDirectories(conf);
           break;
         case HADOOP_SECURITY_GROUPS_MAPPING_REDIS_IP:
-          Groups.refreshGroupsMappingServiceConf(conf);
           rpcServer.refreshWhiteList(conf);
           break;
         case HADOOP_SECURITY_USE_WHITELIST:

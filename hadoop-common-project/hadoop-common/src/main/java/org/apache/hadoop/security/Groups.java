@@ -19,23 +19,23 @@ package org.apache.hadoop.security;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Ticker;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.Cache;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import org.apache.hadoop.HadoopIllegalArgumentException;
 import org.apache.hadoop.classification.InterfaceAudience;
 import org.apache.hadoop.classification.InterfaceAudience.Private;
 import org.apache.hadoop.classification.InterfaceStability;
-import org.apache.hadoop.conf.Configurable;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.CommonConfigurationKeys;
 import org.apache.hadoop.util.ReflectionUtils;
 import org.apache.hadoop.util.StringUtils;
-import org.apache.hadoop.util.Time;
 import org.apache.hadoop.util.Timer;
 
 import org.apache.commons.logging.Log;
@@ -54,8 +54,9 @@ import org.apache.commons.logging.LogFactory;
 public class Groups {
   private static final Log LOG = LogFactory.getLog(Groups.class);
   
-  public final GroupMappingServiceProvider impl;
+  private final GroupMappingServiceProvider impl;
 
+  private final LoadingCache<String, Set<String>> cache;
   private final Map<String, Set<String>> staticUserToGroupsMap =
       new HashMap<String, Set<String>>();
 
@@ -64,7 +65,6 @@ public class Groups {
   private final long warningDeltaMs;
   private final Timer timer;
   private Set<String> negativeCache;
-  private Map<String, CachedGroups> userToGroupsMap;
 
   public Groups(Configuration conf) {
     this(conf, new Timer());
@@ -89,23 +89,18 @@ public class Groups {
         CommonConfigurationKeys.HADOOP_SECURITY_GROUPS_CACHE_WARN_AFTER_MS_DEFAULT);
     parseStaticMapping(conf);
 
-    long cacheExpire =
-      conf.getLong(CommonConfigurationKeys.HADOOP_SECURITY_GROUPS_CACHE_EXPIRE_SECS,
-        CommonConfigurationKeys.HADOOP_SECURITY_GROUPS_CACHE_EXPIRE_SECS_DEFAULT) * 1000;
-
     this.timer = timer;
+    this.cache = CacheBuilder.newBuilder()
+            .refreshAfterWrite(cacheTimeout, TimeUnit.MILLISECONDS)
+            .ticker(new TimerToTickerAdapter(timer))
+            .expireAfterWrite(10 * cacheTimeout, TimeUnit.MILLISECONDS)
+            .build(new GroupCacheLoader());
 
     if(negativeCacheTimeout > 0) {
       Cache<String, Boolean> tempMap = CacheBuilder.newBuilder()
         .expireAfterWrite(negativeCacheTimeout, TimeUnit.MILLISECONDS)
         .ticker(new TimerToTickerAdapter(timer))
         .build();
-
-      Cache<String, CachedGroups> cache =  CacheBuilder.newBuilder()
-          .expireAfterWrite(cacheExpire, TimeUnit.MILLISECONDS)
-          .ticker(new TimerToTickerAdapter(timer))
-          .build();
-      userToGroupsMap = cache.asMap();
       negativeCache = Collections.newSetFromMap(tempMap.asMap());
     }
 
@@ -113,40 +108,6 @@ public class Groups {
       LOG.debug("Group mapping impl=" + impl.getClass().getName() + 
           "; cacheTimeout=" + cacheTimeout + "; warningDeltaMs=" +
           warningDeltaMs);
-  }
-
-  /**
-   * Class to hold the cached groups
-   */
-  public static class CachedGroups {
-    final long timestamp;
-    final Set<String> groups;
-
-    /**
-     * Create and initialize group cache
-     */
-    CachedGroups(Set<String> groups) {
-      this.groups = groups;
-      this.timestamp = Time.now();
-    }
-
-    /**
-     * Returns time of last cache update
-     *
-     * @return time of last cache update
-     */
-    public long getTimestamp() {
-      return timestamp;
-    }
-
-    /**
-     * Get list of cached groups
-     *
-     * @return cached groups
-     */
-    public Set<String> getGroups() {
-      return groups;
-    }
   }
   
   @VisibleForTesting
@@ -213,41 +174,9 @@ public class Groups {
     }
 
     try {
-      // Return cached value if available
-      CachedGroups groups = userToGroupsMap.get(user);
-      long now = Time.now();
-      // if cache has a value and it hasn't expired
-      if (groups != null && (groups.getTimestamp() + cacheTimeout > now)) {
-        if (LOG.isDebugEnabled()) {
-          LOG.debug("Returning cached groups for '" + user + "'");
-        }
-        return groups.getGroups();
-      }
-
-      Set<String> group = fetchGroup(user);
-      if (group == null) {
-        if (groups != null) {
-          return groups.getGroups();
-        } else {
-          if (isNegativeCacheEnabled()) {
-            negativeCache.add(user);
-          }
-          throw noGroupsForUser(user);
-        }
-      }
-
-      // Create and cache user's groups
-      groups = new CachedGroups(group);
-      if (groups.getGroups().isEmpty()) {
-        throw new IOException("No groups found for user " + user);
-      }
-      userToGroupsMap.put(user, groups);
-      if(LOG.isDebugEnabled()) {
-        LOG.debug("Returning fetched groups for '" + user + "'");
-      }
-      return groups.getGroups();
-    } catch (Exception e) {
-      throw noGroupsForUser(user);
+      return cache.get(user);
+    } catch (ExecutionException e) {
+      throw (IOException)e.getCause();
     }
   }
 
@@ -269,21 +198,52 @@ public class Groups {
   }
 
   /**
-   * Queries impl for groups belonging to the user. This could involve I/O and take awhile.
+   * Deals with loading data into the cache.
    */
-  private Set<String> fetchGroup(String user) throws IOException {
-    long startMs = timer.monotonicNow();
-    Set<String> group = impl.getGroups(user);
-    long endMs = timer.monotonicNow();
-    long deltaMs = endMs - startMs ;
-    UserGroupInformation.metrics.addGetGroups(deltaMs);
-    if (deltaMs > warningDeltaMs) {
-      LOG.warn("Potential performance problem: getGroups(user=" + user + ") " +
-          "took " + deltaMs + " milliseconds.");
+  private class GroupCacheLoader extends CacheLoader<String, Set<String>> {
+    /**
+     * This method will block if a cache entry doesn't exist, and
+     * any subsequent requests for the same user will wait on this
+     * request to return. If a user already exists in the cache,
+     * this will be run in the background.
+     * @param user key of cache
+     * @return List of groups belonging to user
+     * @throws IOException to prevent caching negative entries
+     */
+    @Override
+    public Set<String> load(String user) throws Exception {
+      Set<String> groups = fetchGroupList(user);
+
+      if (groups.isEmpty()) {
+        if (isNegativeCacheEnabled()) {
+          negativeCache.add(user);
+        }
+
+        // We throw here to prevent Cache from retaining an empty group
+        throw noGroupsForUser(user);
+      }
+
+      return groups;
     }
 
-    return group;
+    /**
+     * Queries impl for groups belonging to the user. This could involve I/O and take awhile.
+     */
+    private Set<String> fetchGroupList(String user) throws IOException {
+      long startMs = timer.monotonicNow();
+      Set<String> groupList = impl.getGroups(user);
+      long endMs = timer.monotonicNow();
+      long deltaMs = endMs - startMs ;
+      UserGroupInformation.metrics.addGetGroups(deltaMs);
+      if (deltaMs > warningDeltaMs) {
+        LOG.warn("Potential performance problem: getGroups(user=" + user +") " +
+                "took " + deltaMs + " milliseconds.");
+      }
+
+      return groupList;
+    }
   }
+
 
   /**
    * Refresh all user-to-groups mappings.
@@ -295,7 +255,7 @@ public class Groups {
     } catch (IOException e) {
       LOG.warn("Error refreshing groups cache", e);
     }
-    userToGroupsMap.clear();
+    cache.invalidateAll();
     if(isNegativeCacheEnabled()) {
       negativeCache.clear();
     }
@@ -353,11 +313,5 @@ public class Groups {
 
     GROUPS = new Groups(conf);
     return GROUPS;
-  }
-
-  public static synchronized void refreshGroupsMappingServiceConf(Configuration conf) {
-      if (GROUPS.impl != null && GROUPS.impl instanceof Configurable) {
-        ((Configurable) GROUPS.impl).setConf(conf);
-      }
   }
 }
