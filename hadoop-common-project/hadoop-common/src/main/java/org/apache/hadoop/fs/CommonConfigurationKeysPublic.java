@@ -270,6 +270,8 @@ public class CommonConfigurationKeysPublic {
     "hadoop.security.group.mapping.redis.ip";
   public static final String  HADOOP_SECURITY_USE_WHITELIST =
     "hadoop.security.whitelist.enabled";;
+  public static final String HADOOP_SECURITY_CONFIGURATIONBASED_GROUP_MAPPING_FILE =
+    "hadoop.security.group.mapping.configurationbased.file";
   /** See <a href="{@docRoot}/../core-default.html">core-default.xml</a> */
   public static final long HADOOP_SECURITY_GROUPS_CACHE_SECS_DEFAULT =
     300;

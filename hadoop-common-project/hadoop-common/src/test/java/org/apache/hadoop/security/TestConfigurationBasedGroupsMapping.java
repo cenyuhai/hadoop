@@ -6,6 +6,8 @@ import org.junit.Test;
 
 import java.util.Set;
 
+import static org.apache.hadoop.fs.CommonConfigurationKeysPublic.HADOOP_SECURITY_CONFIGURATIONBASED_GROUP_MAPPING_FILE;
+
 /**
  * Created by user on 01/02/2017.
  */
@@ -21,7 +23,7 @@ public class TestConfigurationBasedGroupsMapping {
   @Test
   public void testWrongConfiguration() {
     Configuration conf = new Configuration();
-    conf.set(ConfigurationBasedGroupsMapping.HADOOP_SECURITY_CONFIGURATIONBASED_GROUP_MAPPING_FILE, "filenotexists");
+    conf.set(HADOOP_SECURITY_CONFIGURATIONBASED_GROUP_MAPPING_FILE, "filenotexists");
 
     ConfigurationBasedGroupsMapping mapping = new ConfigurationBasedGroupsMapping(conf);
     Assert.assertTrue(mapping.getUser2groups().isEmpty());
@@ -35,7 +37,7 @@ public class TestConfigurationBasedGroupsMapping {
             .getPath();
 
     Configuration conf = new Configuration();
-    conf.set(ConfigurationBasedGroupsMapping.HADOOP_SECURITY_CONFIGURATIONBASED_GROUP_MAPPING_FILE, fileName);
+    conf.set(HADOOP_SECURITY_CONFIGURATIONBASED_GROUP_MAPPING_FILE, fileName);
 
     ConfigurationBasedGroupsMapping mapping = new ConfigurationBasedGroupsMapping(conf);
 

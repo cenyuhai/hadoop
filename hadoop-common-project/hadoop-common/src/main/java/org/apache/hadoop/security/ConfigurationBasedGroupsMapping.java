@@ -10,11 +10,17 @@ import org.apache.hadoop.classification.InterfaceStability;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.util.StringUtils;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.File;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.FileInputStream;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static org.apache.hadoop.fs.CommonConfigurationKeysPublic.HADOOP_SECURITY_CONFIGURATIONBASED_GROUP_MAPPING_FILE;
 
 @InterfaceAudience.LimitedPrivate({"HDFS", "MapReduce"})
 @InterfaceStability.Evolving
@@ -22,10 +28,6 @@ public class ConfigurationBasedGroupsMapping
         implements GroupMappingServiceProvider {
 
   private static final Log LOG = LogFactory.getLog(ConfigurationBasedGroupsMapping.class);
-
-
-  protected static final String HADOOP_SECURITY_CONFIGURATIONBASED_GROUP_MAPPING_FILE =
-            GROUP_MAPPING_CONFIG_PREFIX + ".configurationbased.file";
 
   private HashMultimap<String, String> user2groups = HashMultimap.create();
 
@@ -90,7 +92,7 @@ public class ConfigurationBasedGroupsMapping
 
     // new set
     HashMultimap<String, String> newUser2groups = HashMultimap.create();
-    LOG.info("Loading " + filename);
+    LOG.info("Loading new group mapping file: " + filename);
     try (BufferedReader reader = new BufferedReader(
             new InputStreamReader(new FileInputStream(file), Charsets.UTF_8))) {
 
@@ -99,7 +101,7 @@ public class ConfigurationBasedGroupsMapping
       while ((line = reader.readLine()) != null) {
 
         if (LOG.isDebugEnabled()) {
-          LOG.debug("handle " + line);
+          LOG.debug("Loading new group mapping file: Handle " + line);
         }
 
         Collection<String> userToGroups = StringUtils.getStringCollection(line,
@@ -118,7 +120,7 @@ public class ConfigurationBasedGroupsMapping
       }
     }
 
-    LOG.info("Loaded " + newUser2groups.keySet().size() + " users from " + filename);
+    LOG.info("Loaded " + newUser2groups.keySet().size() + " users from new group mapping file: " + filename);
 
     // switch reference
     this.user2groups = newUser2groups;
