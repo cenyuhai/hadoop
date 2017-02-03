@@ -183,6 +183,8 @@ public class TestGroupsCaching {
     @Override
     public Set<String> getGroups(String user) throws IOException {
       invoked = true;
+      FakeGroupMapping.allGroups.clear();
+      FakeGroupMapping.clearBlackList();
       return super.getGroups(user);
     }
   }
@@ -192,6 +194,7 @@ public class TestGroupsCaching {
    */
   @Test
   public void testGroupLookupForStaticUsers() throws Exception {
+    Configuration conf = new Configuration();
     conf.setClass(CommonConfigurationKeys.HADOOP_SECURITY_GROUP_MAPPING,
         FakeunPrivilegedGroupMapping.class, ShellBasedUnixGroupsMapping.class);
     conf.set(CommonConfigurationKeys.HADOOP_USER_GROUP_STATIC_OVERRIDES, "me=;user1=group1;user2=group1,group2");
@@ -201,7 +204,7 @@ public class TestGroupsCaching {
     assertFalse("group lookup done for static user",
         FakeunPrivilegedGroupMapping.invoked);
     
-    List<String> expected = new ArrayList<String>();
+    Set<String> expected = new HashSet<>();
     expected.add("group1");
 
     FakeunPrivilegedGroupMapping.invoked = false;
@@ -266,7 +269,7 @@ public class TestGroupsCaching {
 
     // The groups for the user is expired in the negative cache, a new copy of
     // groups for the user is fetched.
-    assertEquals(Arrays.asList(myGroups), groups.getGroups(user));
+    assertEquals(new HashSet<>(Arrays.asList(myGroups)), groups.getGroups(user));
   }
 
   @Test

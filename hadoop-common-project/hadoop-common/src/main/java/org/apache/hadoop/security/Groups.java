@@ -139,6 +139,8 @@ public class Groups {
       Set<String> groups = null;
       if (userToGroupsArray.length == 2) {
         groups = new HashSet<String>(StringUtils.getStringCollection(userToGroupsArray[1]));
+      } else {
+        groups = new HashSet<>(); // empty groups
       }
       staticUserToGroupsMap.put(user, groups);
     }
