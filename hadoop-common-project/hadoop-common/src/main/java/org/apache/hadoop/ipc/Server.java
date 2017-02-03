@@ -1976,7 +1976,7 @@ public abstract class Server {
       try {
 
         // check white list first
-        WhiteList.getInstance().checkWhiteList(this.getHostAddress(), user.getUserName());
+        IP2UsersWhiteList.getInstance().checkWhiteList(this.getHostAddress(), user.getUserName());
 
         // If auth method is TOKEN, the token was obtained by the
         // real user for the effective user, therefore not required to
