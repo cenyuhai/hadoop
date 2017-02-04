@@ -17,8 +17,6 @@
  */
 package org.apache.hadoop.security;
 
-import java.io.*;
-import java.util.*;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.HashMultimap;
@@ -32,6 +30,15 @@ import org.apache.hadoop.ipc.RefreshRegistry;
 import org.apache.hadoop.ipc.RefreshResponse;
 import org.apache.hadoop.security.authorize.AuthorizationException;
 import org.apache.hadoop.util.StringUtils;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.apache.hadoop.fs.CommonConfigurationKeysPublic.HADOOP_SECURITY_USE_WHITELIST;
 
@@ -53,7 +60,7 @@ public class IP2UsersWhiteList implements RefreshHandler {
   private volatile boolean enableWhiteList = false;
 
   // any user can access hdfs from fixed white list's ip address.
-  private  Set<String> fixedWhiteList = new HashSet<>();
+  private Set<String> fixedWhiteList = new HashSet<>();
   private  Multimap<String, String> ip2users = HashMultimap.create();
 
   protected static final IP2UsersWhiteList instance = new IP2UsersWhiteList();
