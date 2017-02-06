@@ -38,10 +38,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.security.PrivilegedExceptionAction;
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
 import static org.apache.hadoop.fs.CommonConfigurationKeys.HADOOP_USER_GROUP_METRICS_PERCENTILES_INTERVALS;
 import static org.apache.hadoop.fs.CommonConfigurationKeysPublic.HADOOP_SECURITY_AUTH_TO_LOCAL;
@@ -431,8 +428,11 @@ public class TestUserGroupInformation {
     UserGroupInformation uugi = 
       UserGroupInformation.createUserForTesting(USER_NAME, GROUP_NAMES);
     assertEquals(USER_NAME, uugi.getUserName());
+
+    String[] groups = uugi.getGroupNames();
+    Arrays.sort(groups);
     assertArrayEquals(new String[]{GROUP1_NAME, GROUP2_NAME, GROUP3_NAME},
-                      uugi.getGroupNames());
+            groups);
   }
 
   @SuppressWarnings("unchecked") // from Mockito mocks

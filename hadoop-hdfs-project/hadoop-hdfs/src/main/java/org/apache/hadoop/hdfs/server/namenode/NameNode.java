@@ -159,9 +159,6 @@ public class NameNode extends ReconfigurableBase implements NameNodeStatusMXBean
         case FS_PROTECTED_DIRECTORIES:
           namesystem.getFSDirectory().setProtectedDirectories(conf);
           break;
-        case HADOOP_SECURITY_GROUPS_MAPPING_REDIS_IP:
-          Groups.refreshGroupsMappingServiceConf(conf);
-          break;
         case DFS_HEARTBEAT_EXPIRE_INTERVAL_KEY:
           long expireMS = DFS_HEARTBEAT_EXPIRE_INTERVAL_DEFAULT;
           if (newVal != null && !newVal.isEmpty()) {
