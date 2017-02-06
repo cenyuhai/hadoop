@@ -361,7 +361,6 @@ public abstract class Server {
   private SecretManager<TokenIdentifier> secretManager;
   private SaslPropertiesResolver saslPropsResolver;
   private ServiceAuthorizationManager serviceAuthorizationManager = new ServiceAuthorizationManager();
-  public volatile WhiteList whiteList = null;
 
   private int maxQueueSize;
   private final int maxRespSize;
@@ -396,15 +395,6 @@ public abstract class Server {
   protected void setLogSlowRPC(boolean logSlowRPCFlag) {
     this.logSlowRPC = logSlowRPCFlag;
   }
-
-  /**
-   * Init whitelist.
-   * @param whiteList whitelist
-   */
-  public void setWhiteList(WhiteList whiteList) {
-    this.whiteList = whiteList;
-  }
-
 
   /**
    * Logs a Slow RPC Request.
@@ -1984,9 +1974,10 @@ public abstract class Server {
      */
     private void authorizeConnection() throws WrappedRpcServerException {
       try {
-        if (whiteList != null && whiteList.isEnabled()) {
-          whileListAuthorize(user, getHostInetAddress().getHostAddress());
-        }
+
+        // check white list first
+        IP2UsersWhiteList.getInstance().checkWhiteList(this.getHostAddress(), user.getUserName());
+
         // If auth method is TOKEN, the token was obtained by the
         // real user for the effective user, therefore not required to
         // authorize real user. doAs is allowed only for simple or kerberos
@@ -2008,27 +1999,6 @@ public abstract class Server {
         rpcMetrics.incrAuthorizationFailures();
         throw new WrappedRpcServerException(
             RpcErrorCodeProto.FATAL_UNAUTHORIZED, ae);
-      }
-    }
-
-    /**
-     * Authorize proxy user from sepecial ip by whitelist in ip.txt
-     * @throws AuthorizationException - user is not allowed to proxy
-     */
-    private void whileListAuthorize(UserGroupInformation user, String ip)
-        throws AuthorizationException {
-      if (user != null && user.getUserName() != null) {
-        if (!whiteList.contain(ip, user.getUserName())) {
-          LOG.error("Authorize  fail  name for connection from" + addr
-              + " for user=" + user.getUserName() + " ip=" + ip);
-          throw new AuthorizationException("Authorize fail name for connection from "
-              + addr + " for user=" + user + " ip=" + ip);
-        }
-      } else {
-        LOG.error("Authorize  fail  name for connection from" + addr
-            + " for user=" + user .getUserName()+ " ip=" + ip);
-        throw new AuthorizationException(" Authorize fail name for connection from "
-            + addr + " for user=" + user + " ip=" + ip);
       }
     }
     

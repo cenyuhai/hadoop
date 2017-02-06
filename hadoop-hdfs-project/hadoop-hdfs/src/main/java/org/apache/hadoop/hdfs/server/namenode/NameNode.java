@@ -161,10 +161,7 @@ public class NameNode extends ReconfigurableBase implements NameNodeStatusMXBean
           break;
         case HADOOP_SECURITY_GROUPS_MAPPING_REDIS_IP:
           Groups.refreshGroupsMappingServiceConf(conf);
-          rpcServer.refreshWhiteList(conf);
           break;
-        case HADOOP_SECURITY_USE_WHITELIST:
-          rpcServer.refreshWhiteList(conf);
         case DFS_HEARTBEAT_EXPIRE_INTERVAL_KEY:
           long expireMS = DFS_HEARTBEAT_EXPIRE_INTERVAL_DEFAULT;
           if (newVal != null && !newVal.isEmpty()) {
@@ -309,7 +306,6 @@ public class NameNode extends ReconfigurableBase implements NameNodeStatusMXBean
   public static final HAState STANDBY_STATE = new StandbyState();
   
   protected FSNamesystem namesystem;
-  protected final WhiteList whiteList;
   protected final NamenodeRole role;
   private volatile HAState state;
   private final boolean haEnabled;
@@ -810,7 +806,6 @@ public class NameNode extends ReconfigurableBase implements NameNodeStatusMXBean
     state = createHAState(getStartupOption(conf));
     this.allowStaleStandbyReads = HAUtil.shouldAllowStandbyReads(conf);
     this.haContext = createHAContext();
-    this.whiteList = WhiteList.getWhiteList(conf);
     try {
       initializeGenericKeys(conf, nsId, namenodeId);
       initialize(conf);
@@ -875,7 +870,6 @@ public class NameNode extends ReconfigurableBase implements NameNodeStatusMXBean
     } finally {
       shutdownReconfigurationTask();
       stopCommonServices();
-      whiteList.close();
       if (metrics != null) {
         metrics.shutdown();
       }
