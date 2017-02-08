@@ -23,6 +23,12 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
   <name>Apache Hadoop Main</name>
   <packaging>pom</packaging>
 
+  <parent>
+    <groupId>com.xiaoju</groupId>
+    <artifactId>base-pom</artifactId>
+    <version>0.0.1</version>
+  </parent>
+
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -33,32 +39,6 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
       </dependency>
     </dependencies>
   </dependencyManagement>
-
-  <distributionManagement>
-    <repository>
-      <id>xiaojukeji-releases</id>
-      <url>http://maven.intra.xiaojukeji.com:8081/nexus/content/repositories/releases</url>
-    </repository>
-    <snapshotRepository>
-      <id>xiaojukeji-snapshots</id>
-      <url>http://maven.intra.xiaojukeji.com:8081/nexus/content/repositories/snapshots</url>
-    </snapshotRepository>
-  </distributionManagement>
-
-  <repositories>
-    <repository>
-      <id>${distMgmtSnapshotsId}</id>
-      <name>${distMgmtSnapshotsName}</name>
-      <url>${distMgmtSnapshotsUrl}</url>
-    </repository>
-    <repository>
-      <id>repository.jboss.org</id>
-      <url>http://repository.jboss.org/nexus/content/groups/public/</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
 
   <licenses>
     <license>
