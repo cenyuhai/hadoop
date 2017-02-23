@@ -1,6 +1,5 @@
 package org.apache.hadoop.security;
 
-import com.google.common.annotations.VisibleForTesting;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -8,6 +7,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.ipc.RefreshHandler;
 import org.apache.hadoop.ipc.RefreshRegistry;
 import org.apache.hadoop.ipc.RefreshResponse;
+import org.apache.hadoop.security.authorize.AuthorizationException;
 import org.apache.hadoop.util.StringUtils;
 
 import java.io.*;
@@ -48,7 +48,7 @@ public class PasswordManager implements RefreshHandler {
   // enable password check or not
   private volatile boolean enablePassword = false;
 
-  private static PasswordManager instance = null; // Singleton
+  private static PasswordManager instance = new PasswordManager(); // Singleton
 
   static {
     RefreshRegistry.defaultRegistry().register(REFRESH_PASSWORD_IDENTIFIER, instance);
@@ -73,10 +73,6 @@ public class PasswordManager implements RefreshHandler {
   }
 
   public static PasswordManager getInstance() {
-    if (instance == null) {
-      instance = new PasswordManager();
-    }
-
     return instance;
   }
 
@@ -125,7 +121,7 @@ public class PasswordManager implements RefreshHandler {
    * @param userName user's account name
    * @param password password in plain text
    */
-  public void checkPassword(String userName, String password) throws AccessControlException {
+  public void checkPassword(String userName, String password) throws AuthorizationException {
 
     if (!this.enablePassword) {
       return;
@@ -133,7 +129,7 @@ public class PasswordManager implements RefreshHandler {
 
     PasswordItem item = this.user2Passwd.get(userName);
     if (item == null) {
-      throw new AccessControlException(userName + " not exists.");
+      throw new AuthorizationException(userName + " not exists.");
     }
 
     if (!item.isEnable()) {
@@ -142,16 +138,16 @@ public class PasswordManager implements RefreshHandler {
 
     String digest = item.getDigest();
     if (digest == null || digest.isEmpty()) {
-      throw new AccessControlException(userName + "'s password not set.");
+      throw new AuthorizationException(userName + "'s password not set.");
     }
 
     if (password == null || password.isEmpty()) {
-      throw new AccessControlException(userName + "'s password not specified.");
+      throw new AuthorizationException(userName + "'s password not specified.");
     }
 
     String digest2Check = MD5Digest(password);
     if (!digest.equals(digest2Check)) {
-      throw new AccessControlException(userName + "'s password is wrong.");
+      throw new AuthorizationException(userName + "'s password is wrong.");
     }
 
   }

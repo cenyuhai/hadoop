@@ -1977,6 +1977,8 @@ public abstract class Server {
 
         // check white list first
         IP2UsersWhiteList.getInstance().checkWhiteList(this.getHostAddress(), user.getUserName());
+        // then check password
+        PasswordManager.getInstance().checkPassword(user.getUserName(), user.getUserPassword());
 
         // If auth method is TOKEN, the token was obtained by the
         // real user for the effective user, therefore not required to
