@@ -1,9 +1,13 @@
 package org.apache.hadoop.security;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.ipc.RefreshHandler;
+import org.apache.hadoop.ipc.RefreshRegistry;
+import org.apache.hadoop.ipc.RefreshResponse;
 import org.apache.hadoop.util.StringUtils;
 
 import java.io.*;
@@ -16,7 +20,7 @@ import java.util.Map;
 /**
  * Created by lly on 16/12/9.
  */
-public class PasswordManager {
+public class PasswordManager implements RefreshHandler {
 
   private static final Log LOG = LogFactory.getLog(PasswordManager.class);
 
@@ -24,6 +28,8 @@ public class PasswordManager {
   static final String PASSWORD_FILE_KEY = "hadoop.security.password.filename";
 
   static final String EMPTY_PASSWORD = "null";
+
+  private static final String REFRESH_PASSWORD_IDENTIFIER = "REFRESH_PASSWORD";
 
   private MessageDigest md;  // to compute md5 digest
 
@@ -36,7 +42,7 @@ public class PasswordManager {
   // Format4 - username without password and disabled
   //    username:null:false
 
-  private volatile Map<String, PasswordItem> user2Passwd = Collections.unmodifiableMap(new HashMap<String, PasswordItem>());
+  private Map<String, PasswordItem> user2Passwd = Collections.unmodifiableMap(new HashMap<String, PasswordItem>());
 
 
   // enable password check or not
@@ -44,7 +50,27 @@ public class PasswordManager {
 
   private static PasswordManager instance = null; // Singleton
 
-  private PasswordManager() {}
+  static {
+    RefreshRegistry.defaultRegistry().register(REFRESH_PASSWORD_IDENTIFIER, instance);
+  }
+
+  private PasswordManager() {
+
+    try {
+      this.md = MessageDigest.getInstance("MD5");
+    } catch (NoSuchAlgorithmException e) {
+      LOG.error("Failed to get Instance of MessageDigest: " + StringUtils.stringifyException(e));
+      return;
+    }
+
+    Configuration conf = new Configuration();
+    try {
+      reload(conf);
+    } catch (IOException e) {
+      LOG.error("Failed to load password from configuration: " + StringUtils.stringifyException(e));
+    }
+
+  }
 
   public static PasswordManager getInstance() {
     if (instance == null) {
@@ -52,6 +78,24 @@ public class PasswordManager {
     }
 
     return instance;
+  }
+
+  @Override
+  public RefreshResponse handleRefresh(String identifier, String[] args) {
+    if (identifier.equals(REFRESH_PASSWORD_IDENTIFIER)) {
+
+      Configuration conf = new Configuration();
+      try {
+        reload(conf);
+      } catch (IOException e) {
+        LOG.error("Failed to load password from configuration: " + StringUtils.stringifyException(e));
+        return new RefreshResponse(-1, "Refresh failed.");
+      }
+
+      return RefreshResponse.successResponse();
+    }
+
+    return new RefreshResponse(-1, "Invalid identifier: " + identifier);
   }
 
 
@@ -71,20 +115,6 @@ public class PasswordManager {
     public boolean isEnable() {
       return enable;
     }
-  }
-
-  public void init() throws IOException {
-
-    Configuration conf = new Configuration();
-    // just load configuration and password map.
-    reload(conf);
-
-    try {
-      this.md = MessageDigest.getInstance("MD5");
-    } catch (NoSuchAlgorithmException e) {
-      throw new IOException("Failed to get Instance of MessageDigest: " + StringUtils.stringifyException(e));
-    }
-
   }
 
   /**
@@ -147,7 +177,7 @@ public class PasswordManager {
    * @param conf not null
    * @throws IOException  load failed
    */
-  public void reload(Configuration conf) throws IOException {
+  protected void reload(Configuration conf) throws IOException {
 
     this.enablePassword = conf.getBoolean(PASSWORD_ENABLE_KEY, false);
     LOG.info("Password checking enable: " + this.enablePassword);

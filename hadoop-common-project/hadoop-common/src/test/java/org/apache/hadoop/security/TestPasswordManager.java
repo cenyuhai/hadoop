@@ -12,12 +12,10 @@ import java.net.URL;
  */
 public class TestPasswordManager {
 
-
   @Test
   public void TestPasswordDisabled() throws IOException {
 
-    PasswordManager pm = new PasswordManager();
-    pm.init();
+    PasswordManager pm = PasswordManager.getInstance();
 
     pm.checkPassword("userxxx", "xxxxxx");
 
@@ -27,8 +25,7 @@ public class TestPasswordManager {
   @Test
   public void TestPasswordFileNotSet() throws IOException {
 
-    PasswordManager pm = new PasswordManager();
-    pm.init();
+    PasswordManager pm = PasswordManager.getInstance();
 
     Configuration conf = new Configuration();
     conf.setBoolean(PasswordManager.PASSWORD_ENABLE_KEY, true);
@@ -48,8 +45,7 @@ public class TestPasswordManager {
 
   @Test
   public void testPasswordManager() throws IOException {
-    PasswordManager pm = new PasswordManager();
-    pm.init();
+    PasswordManager pm = PasswordManager.getInstance();
 
     Configuration conf = new Configuration();
     conf.setBoolean(PasswordManager.PASSWORD_ENABLE_KEY, true);
@@ -160,7 +156,5 @@ public class TestPasswordManager {
     pm.checkPassword("user8", null); // password disabled
 
   }
-
-
 
 }
