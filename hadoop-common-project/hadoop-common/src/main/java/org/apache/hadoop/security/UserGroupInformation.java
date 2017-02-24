@@ -144,23 +144,6 @@ public class UserGroupInformation {
       return null;
     }
 
-    /**
-     * Read password from environment then properties then conf.
-     * @return null if can't find password.
-     */
-    private String getPasswordFromEnvOrConf() {
-      String passwd = System.getenv(HADOOP_USER_PASSWD);
-      if (passwd == null) {
-        passwd = System.getProperty(HADOOP_USER_PASSWD);
-      }
-
-      if (passwd == null) {
-        passwd = conf.get(HADOOP_USER_PASSWD_KEY);
-      }
-
-      return passwd;
-    }
-
     @Override
     public boolean commit() throws LoginException {
       if (LOG.isDebugEnabled()) {
@@ -1259,7 +1242,24 @@ public class UserGroupInformation {
   @InterfaceAudience.Public
   @InterfaceStability.Evolving
   public static UserGroupInformation createRemoteUser(String user, AuthMethod authMethod) {
-    return createRemoteUser(user, null, authMethod);
+    return createRemoteUser(user, getPasswordFromEnvOrConf(), authMethod);
+  }
+
+  /**
+   * Read password from environment then properties then conf.
+   * @return null if can't find password.
+   */
+  protected static String getPasswordFromEnvOrConf() {
+    String passwd = System.getenv(HADOOP_USER_PASSWD);
+    if (passwd == null) {
+      passwd = System.getProperty(HADOOP_USER_PASSWD);
+    }
+
+    if (passwd == null) {
+      passwd = conf.get(HADOOP_USER_PASSWD_KEY);
+    }
+
+    return passwd;
   }
 
   /**
