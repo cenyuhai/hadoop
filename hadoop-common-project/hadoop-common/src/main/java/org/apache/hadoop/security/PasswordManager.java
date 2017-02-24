@@ -1,5 +1,6 @@
 package org.apache.hadoop.security;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,8 +32,6 @@ public class PasswordManager implements RefreshHandler {
 
   private static final String REFRESH_PASSWORD_IDENTIFIER = "REFRESH_PASSWORD";
 
-  private MessageDigest md;  // to compute md5 digest
-
   // Format1 - username with password and enabled
   //    username:password:true
   // Format2 - username with password and disabled
@@ -55,13 +54,6 @@ public class PasswordManager implements RefreshHandler {
   }
 
   private PasswordManager() {
-
-    try {
-      this.md = MessageDigest.getInstance("MD5");
-    } catch (NoSuchAlgorithmException e) {
-      LOG.error("Failed to get Instance of MessageDigest: " + StringUtils.stringifyException(e));
-      return;
-    }
 
     Configuration conf = new Configuration();
     try {
@@ -145,26 +137,11 @@ public class PasswordManager implements RefreshHandler {
       throw new AuthorizationException(userName + "'s password not specified.");
     }
 
-    String digest2Check = MD5Digest(password);
+    String digest2Check = DigestUtils.md5Hex(password);
     if (!digest.equals(digest2Check)) {
       throw new AuthorizationException(userName + "'s password is wrong.");
     }
 
-  }
-
-  private String MD5Digest(String original) {
-
-    this.md.reset();
-
-    md.update(original.getBytes());
-    byte[] digest = md.digest();
-
-    StringBuilder sb = new StringBuilder();
-    for (byte b : digest) {
-      sb.append(String.format("%02x", b & 0xff));
-    }
-
-    return sb.toString();
   }
 
 
