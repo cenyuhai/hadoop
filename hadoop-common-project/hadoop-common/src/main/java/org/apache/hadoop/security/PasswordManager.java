@@ -175,10 +175,12 @@ public class PasswordManager implements RefreshHandler {
    */
   protected void reload(Configuration conf) throws IOException {
 
-    this.enablePassword = conf.getBoolean(PASSWORD_ENABLE_KEY, false);
-    LOG.info("Password checking enable: " + this.enablePassword);
+    boolean enablePassword = conf.getBoolean(PASSWORD_ENABLE_KEY, false);
+    LOG.info("Password checking enable: " + enablePassword);
 
-    if (!this.enablePassword) {
+    if (!enablePassword) {
+      this.enablePassword = false;
+      this.user2Passwd = Collections.unmodifiableMap(new HashMap<String, PasswordItem>()); // clean old mapping
       return;
     }
 
@@ -230,6 +232,7 @@ public class PasswordManager implements RefreshHandler {
 
     // change reference
     this.user2Passwd = Collections.unmodifiableMap(newUser2Passwd);
+    this.enablePassword = true;
   }
 
 
