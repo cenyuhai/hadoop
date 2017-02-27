@@ -19,7 +19,7 @@ public class TestPasswordManager {
   private static final Log LOG = LogFactory.getLog(TestPasswordManager.class);
 
   @Test
-  public void TestPasswordDisabled() throws IOException {
+  public void testPasswordDisabled() throws IOException {
 
     LOG.info("TestPasswordDisabled starting");
 
@@ -34,7 +34,7 @@ public class TestPasswordManager {
   }
 
   @Test
-  public void TestPasswordFileNotSet() throws IOException {
+  public void testPasswordFileNotSet() throws IOException {
     LOG.info("TestPasswordFileNotSet starting");
 
     PasswordManager pm = PasswordManager.getInstance();
