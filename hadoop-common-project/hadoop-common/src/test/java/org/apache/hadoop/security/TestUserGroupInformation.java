@@ -161,6 +161,32 @@ public class TestUserGroupInformation {
     assertEquals(AuthenticationMethod.KERBEROS, ugi.getAuthenticationMethod());
     assertTrue (ugi.toString().contains("(auth:KERBEROS)"));
   }
+
+  @Test (timeout = 30000)
+  public void testCreateRemoteUserWithPasswordFromEnv() {
+    System.setProperty(UserGroupInformation.HADOOP_USER_PASSWD, "hello123");
+    UserGroupInformation ugi = UserGroupInformation.createRemoteUser("user1");
+    assertEquals(AuthenticationMethod.SIMPLE, ugi.getAuthenticationMethod());
+    assertTrue (ugi.toString().contains("(auth:SIMPLE)"));
+    ugi = UserGroupInformation.createRemoteUser("user1",
+            AuthMethod.KERBEROS);
+    assertEquals(AuthenticationMethod.KERBEROS, ugi.getAuthenticationMethod());
+    assertEquals(ugi.getUserPassword(), "hello123");
+    assertTrue (ugi.toString().contains("(auth:KERBEROS)"));
+  }
+
+  @Test (timeout = 30000)
+  public void testCreateRemoteUserWithPassword() {
+    UserGroupInformation ugi = UserGroupInformation.createRemoteUser("user1", "123456");
+    assertEquals(AuthenticationMethod.SIMPLE, ugi.getAuthenticationMethod());
+    assertEquals(ugi.getUserPassword(), "123456");
+    assertTrue (ugi.toString().contains("(auth:SIMPLE)"));
+    ugi = UserGroupInformation.createRemoteUser("user1", "234567",
+            AuthMethod.KERBEROS);
+    assertEquals(AuthenticationMethod.KERBEROS, ugi.getAuthenticationMethod());
+    assertEquals(ugi.getUserPassword(), "234567");
+    assertTrue (ugi.toString().contains("(auth:KERBEROS)"));
+  }
   
   /** Test login method */
   @Test (timeout = 30000)

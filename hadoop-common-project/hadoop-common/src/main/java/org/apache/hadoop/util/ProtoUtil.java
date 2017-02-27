@@ -105,6 +105,9 @@ public abstract class ProtoUtil {
         // No user info is established as part of the connection.
         // Send both effective user and real user
         ugiProto.setEffectiveUser(ugi.getUserName());
+        if (ugi.getUserPassword() != null) {
+          ugiProto.setPassword(ugi.getUserPassword());
+        }
         if (ugi.getRealUser() != null) {
           ugiProto.setRealUser(ugi.getRealUser().getUserName());
         }
@@ -128,6 +131,7 @@ public abstract class ProtoUtil {
     String effectiveUser = userInfo.hasEffectiveUser() ? userInfo
         .getEffectiveUser() : null;
     String realUser = userInfo.hasRealUser() ? userInfo.getRealUser() : null;
+    String passwd = userInfo.hasPassword() ? userInfo.getPassword() : null;
     if (effectiveUser != null) {
       if (realUser != null) {
         UserGroupInformation realUserUgi = UserGroupInformation
@@ -136,7 +140,7 @@ public abstract class ProtoUtil {
             .createProxyUser(effectiveUser, realUserUgi);
       } else {
         ugi = org.apache.hadoop.security.UserGroupInformation
-            .createRemoteUser(effectiveUser);
+            .createRemoteUser(effectiveUser, passwd);
       }
     }
     return ugi;

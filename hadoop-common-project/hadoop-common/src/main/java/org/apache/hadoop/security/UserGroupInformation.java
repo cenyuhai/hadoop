@@ -79,7 +79,11 @@ public class UserGroupInformation {
   private static final float TICKET_RENEW_WINDOW = 0.80f;
   private static boolean shouldRenewImmediatelyForTests = false;
   static final String HADOOP_USER_NAME = "HADOOP_USER_NAME";
+  static final String HADOOP_USER_NAME_KEY = "hadoop.user.name";
   static final String HADOOP_PROXY_USER = "HADOOP_PROXY_USER";
+
+  static final String HADOOP_USER_PASSWD = "HADOOP_USER_PASSWORD";
+  static final String HADOOP_USER_PASSWD_KEY = "hadoop.user.password";
 
   /**
    * For the purposes of unit tests, we want to test login
@@ -162,11 +166,14 @@ public class UserGroupInformation {
         }
       }
       //If we don't have a kerberos user and security is disabled, check
-      //if user is specified in the environment or properties
+      //if user is specified in the environment or properties or conf
       if (!isSecurityEnabled() && (user == null)) {
         String envUser = System.getenv(HADOOP_USER_NAME);
         if (envUser == null) {
           envUser = System.getProperty(HADOOP_USER_NAME);
+        }
+        if (envUser == null) {
+          envUser = conf.get(HADOOP_USER_NAME_KEY);
         }
         user = envUser == null ? null : new User(envUser);
       }
@@ -185,7 +192,8 @@ public class UserGroupInformation {
 
         User userEntry = null;
         try {
-          userEntry = new User(user.getName());
+          String passwd = getPasswordFromEnvOrConf();
+          userEntry = new User(user.getName(), passwd);
         } catch (Exception e) {
           throw (LoginException)(new LoginException(e.toString()).initCause(e));
         }
@@ -1215,6 +1223,19 @@ public class UserGroupInformation {
   public static UserGroupInformation createRemoteUser(String user) {
     return createRemoteUser(user, AuthMethod.SIMPLE);
   }
+
+  /**
+   * Create a user from a login name and password. It is intended to be used for remote
+   * users in RPC, since it won't have any credentials.
+   * @param user the full user principal name, must not be empty or null
+   * @param passwd password of user
+   * @return the UserGroupInformation for the remote user.
+   */
+  @InterfaceAudience.Public
+  @InterfaceStability.Evolving
+  public static UserGroupInformation createRemoteUser(String user, String passwd) {
+    return createRemoteUser(user, passwd, AuthMethod.SIMPLE);
+  }
   
   /**
    * Create a user from a login name. It is intended to be used for remote
@@ -1225,11 +1246,41 @@ public class UserGroupInformation {
   @InterfaceAudience.Public
   @InterfaceStability.Evolving
   public static UserGroupInformation createRemoteUser(String user, AuthMethod authMethod) {
+    return createRemoteUser(user, getPasswordFromEnvOrConf(), authMethod);
+  }
+
+  /**
+   * Read password from environment then properties then conf.
+   * @return null if can't find password.
+   */
+  protected static String getPasswordFromEnvOrConf() {
+    String passwd = System.getenv(HADOOP_USER_PASSWD);
+    if (passwd == null) {
+      passwd = System.getProperty(HADOOP_USER_PASSWD);
+    }
+
+    if (passwd == null) {
+      passwd = conf.get(HADOOP_USER_PASSWD_KEY);
+    }
+
+    return passwd;
+  }
+
+  /**
+   * Create a user from a login name. It is intended to be used for remote
+   * users in RPC, since it won't have any credentials.
+   * @param user the full user principal name, must not be empty or null
+   * @param passwd password of user
+   * @return the UserGroupInformation for the remote user.
+   */
+  @InterfaceAudience.Public
+  @InterfaceStability.Evolving
+  public static UserGroupInformation createRemoteUser(String user, String passwd, AuthMethod authMethod) {
     if (user == null || user.isEmpty()) {
       throw new IllegalArgumentException("Null user");
     }
     Subject subject = new Subject();
-    subject.getPrincipals().add(new User(user));
+    subject.getPrincipals().add(new User(user, passwd));
     UserGroupInformation result = new UserGroupInformation(subject);
     result.setAuthenticationMethod(authMethod);
     return result;
@@ -1408,6 +1459,13 @@ public class UserGroupInformation {
   public String getShortUserName() {
     for (User p: subject.getPrincipals(User.class)) {
       return p.getShortName();
+    }
+    return null;
+  }
+
+  public String getUserPassword() {
+    for (User p: subject.getPrincipals(User.class)) {
+      return p.getPassword();
     }
     return null;
   }
