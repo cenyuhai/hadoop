@@ -79,6 +79,7 @@ public class UserGroupInformation {
   private static final float TICKET_RENEW_WINDOW = 0.80f;
   private static boolean shouldRenewImmediatelyForTests = false;
   static final String HADOOP_USER_NAME = "HADOOP_USER_NAME";
+  static final String HADOOP_USER_NAME_KEY = "hadoop.user.name";
   static final String HADOOP_PROXY_USER = "HADOOP_PROXY_USER";
 
   static final String HADOOP_USER_PASSWD = "HADOOP_USER_PASSWORD";
@@ -165,11 +166,14 @@ public class UserGroupInformation {
         }
       }
       //If we don't have a kerberos user and security is disabled, check
-      //if user is specified in the environment or properties
+      //if user is specified in the environment or properties or conf
       if (!isSecurityEnabled() && (user == null)) {
         String envUser = System.getenv(HADOOP_USER_NAME);
         if (envUser == null) {
           envUser = System.getProperty(HADOOP_USER_NAME);
+        }
+        if (envUser == null) {
+          envUser = conf.get(HADOOP_USER_NAME_KEY);
         }
         user = envUser == null ? null : new User(envUser);
       }
