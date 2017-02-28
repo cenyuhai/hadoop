@@ -90,9 +90,7 @@ public class ContainerTokenIdentifier extends TokenIdentifier {
     if (appSubmitterPassword != null) {
       builder.setAppSubmitterPassword(appSubmitterPassword);
     }
-    if (appSubmitterPassword != null) {
 
-    }
     if (r != null) {
       builder.setResource(((ResourcePBImpl)r).getProto());
     }
