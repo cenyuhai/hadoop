@@ -121,7 +121,7 @@ public interface ApplicationConstants {
      * $USER_PASSWORD
      * Final, non-modifiable.
      */
-    USER_PASSWORD("USER_PASSWORD"),
+    USER_PASSWORD(UserGroupInformation.HADOOP_USER_PASSWD),
     
     /**
      * $LOGNAME
