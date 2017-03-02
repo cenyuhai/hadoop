@@ -442,7 +442,7 @@ public class ResourceLocalizationService extends CompositeService
     LoadingCache<Path,Future<FileStatus>> statCache =
         CacheBuilder.newBuilder().build(FSDownload.createStatusCacheLoader(getConfig()));
     LocalizerContext ctxt = new LocalizerContext(
-        c.getUser(), c.getContainerId(), c.getCredentials(), statCache);
+        c.getUser(), c.getUserPassword(), c.getContainerId(), c.getCredentials(), statCache);
     Map<LocalResourceVisibility, Collection<LocalResourceRequest>> rsrcs =
       rsrcReqs.getRequestedResources();
     for (Map.Entry<LocalResourceVisibility, Collection<LocalResourceRequest>> e :
@@ -1115,7 +1115,7 @@ public class ResourceLocalizationService extends CompositeService
         List<String> logDirs = getInitializedLogDirs();
         if (dirsHandler.areDisksHealthy()) {
           exec.startLocalizer(nmPrivateCTokensPath, localizationServerAddress,
-              context.getUser(),
+              context.getUser(), context.getUserPassword(),
               ConverterUtils.toString(
                   context.getContainerId().
                   getApplicationAttemptId().getApplicationId()),

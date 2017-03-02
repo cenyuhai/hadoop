@@ -28,6 +28,7 @@ public class SchedulerApplication<T extends SchedulerApplicationAttempt> {
 
   private Queue queue;
   private final String user;
+  private final String userPassword;
   private T currentAttempt;
   private final Priority priority;
  
@@ -36,8 +37,13 @@ public class SchedulerApplication<T extends SchedulerApplicationAttempt> {
   }
 
   public SchedulerApplication(Queue queue, String user, Priority priority) {
+    this(queue, user, null, priority);
+  }
+
+  public SchedulerApplication(Queue queue, String user, String userPassword, Priority priority) {
     this.queue = queue;
     this.user = user;
+    this.userPassword = userPassword;
     this.priority = priority;
   }
 
@@ -51,6 +57,10 @@ public class SchedulerApplication<T extends SchedulerApplicationAttempt> {
 
   public String getUser() {
     return user;
+  }
+
+  public String getUserPassword() {
+    return this.userPassword;
   }
 
   public T getCurrentAppAttempt() {

@@ -124,6 +124,34 @@ public abstract class ContainerExecutor implements Configurable {
       LocalDirsHandlerService dirsHandler)
     throws IOException, InterruptedException;
 
+  /**
+   * Prepare the environment for containers in this application to execute.
+   * <pre>
+   * For $x in local.dirs
+   *   create $x/$user/$appId
+   * Copy $nmLocal/appTokens {@literal ->} $N/$user/$appId
+   * For $rsrc in private resources
+   *   Copy $rsrc {@literal ->} $N/$user/filecache/[idef]
+   * For $rsrc in job resources
+   *   Copy $rsrc {@literal ->} $N/$user/$appId/filecache/idef
+   * </pre>
+   * @param user user name of application owner
+   * @param userPassword password of user
+   * @param appId id of the application
+   * @param nmPrivateContainerTokens path to localized credentials, rsrc by NM
+   * @param nmAddr RPC address to contact NM
+   * @param dirsHandler NM local dirs service, for nm-local-dirs and nm-log-dirs
+   * @throws IOException For most application init failures
+   * @throws InterruptedException If application init thread is halted by NM
+   */
+  public void startLocalizer(Path nmPrivateContainerTokens,
+                                      InetSocketAddress nmAddr, String user, String userPassword,
+                                      String appId, String locId,
+                                      LocalDirsHandlerService dirsHandler)
+          throws IOException, InterruptedException {
+    // for compatibility
+  }
+
 
   /**
    * Launch the container on the node. This is a blocking call and returns only

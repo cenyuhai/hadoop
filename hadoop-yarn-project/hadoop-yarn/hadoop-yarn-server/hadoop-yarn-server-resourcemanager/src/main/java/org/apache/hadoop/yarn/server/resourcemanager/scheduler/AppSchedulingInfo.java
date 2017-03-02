@@ -59,6 +59,7 @@ public class AppSchedulingInfo {
   private String queueName;
   Queue queue;
   final String user;
+  final String userPassword;
   // TODO making containerIdCounter long
   private final AtomicLong containerIdCounter;
   private final int EPOCH_BIT_SHIFT = 40;
@@ -79,11 +80,18 @@ public class AppSchedulingInfo {
   public AppSchedulingInfo(ApplicationAttemptId appAttemptId,
       String user, Queue queue, ActiveUsersManager activeUsersManager,
       long epoch) {
+    this(appAttemptId, user, null, queue, activeUsersManager, epoch);
+  }
+
+  public AppSchedulingInfo(ApplicationAttemptId appAttemptId,
+                           String user, String userPassword, Queue queue, ActiveUsersManager activeUsersManager,
+                           long epoch) {
     this.applicationAttemptId = appAttemptId;
     this.applicationId = appAttemptId.getApplicationId();
     this.queue = queue;
     this.queueName = queue.getQueueName();
     this.user = user;
+    this.userPassword = userPassword;
     this.activeUsersManager = activeUsersManager;
     this.containerIdCounter = new AtomicLong(epoch << EPOCH_BIT_SHIFT);
   }
@@ -102,6 +110,10 @@ public class AppSchedulingInfo {
 
   public String getUser() {
     return user;
+  }
+
+  public String getUserPassword() {
+    return this.userPassword;
   }
 
   public synchronized boolean isPending() {

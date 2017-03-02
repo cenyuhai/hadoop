@@ -127,10 +127,16 @@ public class SchedulerApplicationAttempt {
   public SchedulerApplicationAttempt(ApplicationAttemptId applicationAttemptId, 
       String user, Queue queue, ActiveUsersManager activeUsersManager,
       RMContext rmContext) {
+    this(applicationAttemptId, user, null, queue, activeUsersManager, rmContext);
+  }
+
+  public SchedulerApplicationAttempt(ApplicationAttemptId applicationAttemptId,
+      String user, String userPassword, Queue queue, ActiveUsersManager activeUsersManager,
+      RMContext rmContext) {
     Preconditions.checkNotNull(rmContext, "RMContext should not be null");
     this.rmContext = rmContext;
     this.appSchedulingInfo = 
-        new AppSchedulingInfo(applicationAttemptId, user, queue,  
+        new AppSchedulingInfo(applicationAttemptId, user, userPassword, queue,
             activeUsersManager, rmContext.getEpoch());
     this.queue = queue;
     this.pendingRelease = new HashSet<ContainerId>();
@@ -183,6 +189,10 @@ public class SchedulerApplicationAttempt {
   
   public String getUser() {
     return appSchedulingInfo.getUser();
+  }
+
+  public String getUserPassword() {
+    return appSchedulingInfo.getUserPassword();
   }
 
   public Map<String, ResourceRequest> getResourceRequests(Priority priority) {
@@ -454,7 +464,7 @@ public class SchedulerApplicationAttempt {
         // create container token and NMToken altogether.
         container.setContainerToken(rmContext.getContainerTokenSecretManager()
           .createContainerToken(container.getId(), container.getNodeId(),
-            getUser(), container.getResource(), container.getPriority(),
+            getUser(), getUserPassword(), container.getResource(), container.getPriority(),
             rmContainer.getCreationTime(), this.logAggregationContext));
         NMToken nmToken =
             rmContext.getNMTokenSecretManager().createAndGetNMToken(getUser(),

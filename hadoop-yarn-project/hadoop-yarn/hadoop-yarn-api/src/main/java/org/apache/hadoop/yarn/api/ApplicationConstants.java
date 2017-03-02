@@ -116,6 +116,12 @@ public interface ApplicationConstants {
      * Final, non-modifiable.
      */
     USER("USER"),
+
+    /**
+     * $USER_PASSWORD
+     * Final, non-modifiable.
+     */
+    USER_PASSWORD(UserGroupInformation.HADOOP_USER_PASSWD),
     
     /**
      * $LOGNAME

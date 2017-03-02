@@ -276,10 +276,17 @@ public class RMAppManager implements EventHandler<RMAppManagerEvent>,
   protected void submitApplication(
       ApplicationSubmissionContext submissionContext, long submitTime,
       String user) throws YarnException {
+    submitApplication(submissionContext, submitTime, user, null);
+  }
+
+  @SuppressWarnings("unchecked")
+  protected void submitApplication(
+          ApplicationSubmissionContext submissionContext, long submitTime,
+          String user, String userPassword) throws YarnException {
     ApplicationId applicationId = submissionContext.getApplicationId();
 
     RMAppImpl application =
-        createAndPopulateNewRMApp(submissionContext, submitTime, user, false);
+        createAndPopulateNewRMApp(submissionContext, submitTime, user, userPassword, false);
     ApplicationId appId = submissionContext.getApplicationId();
 
     if (UserGroupInformation.isSecurityEnabled()) {
@@ -323,8 +330,14 @@ public class RMAppManager implements EventHandler<RMAppManagerEvent>,
   }
 
   private RMAppImpl createAndPopulateNewRMApp(
+          ApplicationSubmissionContext submissionContext, long submitTime,
+          String user, boolean isRecovery) throws YarnException {
+    return createAndPopulateNewRMApp(submissionContext, submitTime, user, null, isRecovery);
+  }
+
+  private RMAppImpl createAndPopulateNewRMApp(
       ApplicationSubmissionContext submissionContext, long submitTime,
-      String user, boolean isRecovery) throws YarnException {
+      String user, String userPassword, boolean isRecovery) throws YarnException {
     ApplicationId applicationId = submissionContext.getApplicationId();
     ResourceRequest amReq =
         validateAndCreateResourceRequest(submissionContext, isRecovery);
@@ -332,7 +345,7 @@ public class RMAppManager implements EventHandler<RMAppManagerEvent>,
     // Create RMApp
     RMAppImpl application =
         new RMAppImpl(applicationId, rmContext, this.conf,
-            submissionContext.getApplicationName(), user,
+            submissionContext.getApplicationName(), user, userPassword,
             submissionContext.getQueue(),
             submissionContext, this.scheduler, this.masterService,
             submitTime, submissionContext.getApplicationType(),

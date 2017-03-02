@@ -575,7 +575,17 @@ public class FairScheduler extends
    * configured limits, but the app will not be marked as runnable.
    */
   protected synchronized void addApplication(ApplicationId applicationId,
-      String queueName, String user, boolean isAppRecovering) {
+                                             String queueName, String user, boolean isAppRecovering) {
+    addApplication(applicationId, queueName, user, null, isAppRecovering);
+  }
+
+  /**
+   * Add a new application to the scheduler, with a given id, queue name, and
+   * user and user's password. This will accept a new app even if the user or queue is above
+   * configured limits, but the app will not be marked as runnable.
+   */
+  protected synchronized void addApplication(ApplicationId applicationId,
+      String queueName, String user, String userPassword, boolean isAppRecovering) {
     if (queueName == null || queueName.isEmpty()) {
       String message = "Reject application " + applicationId +
               " submitted by user " + user + " with an empty queue name.";
@@ -623,7 +633,7 @@ public class FairScheduler extends
     }
   
     SchedulerApplication<FSAppAttempt> application =
-        new SchedulerApplication<FSAppAttempt>(queue, user, 
+        new SchedulerApplication<FSAppAttempt>(queue, user, userPassword,
               rmApp.getApplicationSubmissionContext().getPriority());
     applications.put(applicationId, application);
     queue.getMetrics().submitApp(user);
@@ -655,10 +665,12 @@ public class FairScheduler extends
        return ;
     }
     String user = application.getUser();
+    String userPassword = application.getUserPassword();
     FSLeafQueue queue = (FSLeafQueue) application.getQueue();
 
+
     FSAppAttempt attempt =
-        new FSAppAttempt(this, applicationAttemptId, user,
+        new FSAppAttempt(this, applicationAttemptId, user, userPassword,
             queue, application.getPriority(),
             new ActiveUsersManager(getRootQueueMetrics()), rmContext);
     if (transferStateFromPreviousAttempt) {
@@ -1221,7 +1233,7 @@ public class FairScheduler extends
               appAddedEvent.getReservationID());
       if (queueName != null) {
         addApplication(appAddedEvent.getApplicationId(),
-            queueName, appAddedEvent.getUser(),
+            queueName, appAddedEvent.getUser(), appAddedEvent.getUserPassword(),
             appAddedEvent.getIsAppRecovering());
       }
       break;

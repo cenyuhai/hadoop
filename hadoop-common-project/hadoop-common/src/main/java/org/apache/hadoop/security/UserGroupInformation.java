@@ -82,8 +82,8 @@ public class UserGroupInformation {
   static final String HADOOP_USER_NAME_KEY = "hadoop.user.name";
   static final String HADOOP_PROXY_USER = "HADOOP_PROXY_USER";
 
-  static final String HADOOP_USER_PASSWD = "HADOOP_USER_PASSWORD";
-  static final String HADOOP_USER_PASSWD_KEY = "hadoop.user.password";
+  public static final String HADOOP_USER_PASSWD = "HADOOP_USER_PASSWORD";
+  public static final String HADOOP_USER_PASSWD_KEY = "hadoop.user.password";
 
   /**
    * For the purposes of unit tests, we want to test login

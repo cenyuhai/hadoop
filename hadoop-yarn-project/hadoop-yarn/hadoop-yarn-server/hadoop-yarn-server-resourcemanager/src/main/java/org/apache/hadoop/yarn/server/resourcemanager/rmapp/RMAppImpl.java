@@ -108,6 +108,7 @@ public class RMAppImpl implements RMApp, Recoverable {
   private final RMContext rmContext;
   private final Configuration conf;
   private final String user;
+  private final String userPassword;
   private final String name;
   private final ApplicationSubmissionContext submissionContext;
   private final Dispatcher dispatcher;
@@ -363,6 +364,17 @@ public class RMAppImpl implements RMApp, Recoverable {
       ApplicationMasterService masterService, long submitTime,
       String applicationType, Set<String> applicationTags, 
       ResourceRequest amReq) {
+    this(applicationId, rmContext, config, name, user, null, queue,
+    submissionContext, scheduler, masterService, submitTime,
+    applicationType, applicationTags, amReq);
+  }
+
+  public RMAppImpl(ApplicationId applicationId, RMContext rmContext,
+                   Configuration config, String name, String user, String userPassword, String queue,
+                   ApplicationSubmissionContext submissionContext, YarnScheduler scheduler,
+                   ApplicationMasterService masterService, long submitTime,
+                   String applicationType, Set<String> applicationTags,
+                   ResourceRequest amReq) {
 
     this.systemClock = new SystemClock();
 
@@ -373,6 +385,7 @@ public class RMAppImpl implements RMApp, Recoverable {
     this.handler = dispatcher.getEventHandler();
     this.conf = config;
     this.user = user;
+    this.userPassword = userPassword;
     this.queue = queue;
     this.submissionContext = submissionContext;
     this.scheduler = scheduler;
@@ -451,6 +464,11 @@ public class RMAppImpl implements RMApp, Recoverable {
   @Override
   public String getUser() {
     return this.user;
+  }
+
+  @Override
+  public String getUserPassword() {
+    return this.userPassword;
   }
 
   @Override
@@ -867,7 +885,7 @@ public class RMAppImpl implements RMApp, Recoverable {
       // started or started but not yet saved.
       if (app.attempts.isEmpty()) {
         app.scheduler.handle(new AppAddedSchedulerEvent(app.applicationId,
-          app.submissionContext.getQueue(), app.user,
+          app.submissionContext.getQueue(), app.user, app.userPassword, false,
           app.submissionContext.getReservationID()));
         return RMAppState.SUBMITTED;
       }
@@ -875,7 +893,7 @@ public class RMAppImpl implements RMApp, Recoverable {
       // Add application to scheduler synchronously to guarantee scheduler
       // knows applications before AM or NM re-registers.
       app.scheduler.handle(new AppAddedSchedulerEvent(app.applicationId,
-        app.submissionContext.getQueue(), app.user, true,
+        app.submissionContext.getQueue(), app.user, app.userPassword, true,
           app.submissionContext.getReservationID()));
 
       // recover attempts
@@ -903,7 +921,7 @@ public class RMAppImpl implements RMApp, Recoverable {
     @Override
     public void transition(RMAppImpl app, RMAppEvent event) {
       app.handler.handle(new AppAddedSchedulerEvent(app.applicationId,
-        app.submissionContext.getQueue(), app.user,
+        app.submissionContext.getQueue(), app.user, app.userPassword, false,
         app.submissionContext.getReservationID()));
     }
   }

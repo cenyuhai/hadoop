@@ -95,7 +95,14 @@ public class FSAppAttempt extends SchedulerApplicationAttempt
       ApplicationAttemptId applicationAttemptId, String user, FSLeafQueue queue,
       Priority priority,
       ActiveUsersManager activeUsersManager, RMContext rmContext) {
-    super(applicationAttemptId, user, queue, activeUsersManager, rmContext);
+    this(scheduler, applicationAttemptId, user, null, queue, priority, activeUsersManager, rmContext);
+  }
+
+  public FSAppAttempt(FairScheduler scheduler,
+                      ApplicationAttemptId applicationAttemptId, String user, String userPassword,
+                      FSLeafQueue queue, Priority priority,
+                      ActiveUsersManager activeUsersManager, RMContext rmContext) {
+    super(applicationAttemptId, user, userPassword, queue, activeUsersManager, rmContext);
 
     this.scheduler = scheduler;
     this.startTime = scheduler.getClock().getTime();

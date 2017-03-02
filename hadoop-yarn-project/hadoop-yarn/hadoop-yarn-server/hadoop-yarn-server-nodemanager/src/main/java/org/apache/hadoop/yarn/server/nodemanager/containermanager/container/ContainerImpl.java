@@ -94,6 +94,7 @@ public class ContainerImpl implements Container {
   private final ContainerId containerId;
   private final Resource resource;
   private final String user;
+  private final String userPassword;
   private int exitCode = ContainerExitStatus.INVALID;
   private final StringBuilder diagnostics;
   private boolean wasLaunched;
@@ -144,6 +145,7 @@ public class ContainerImpl implements Container {
     this.credentials = creds;
     this.metrics = metrics;
     user = containerTokenIdentifier.getApplicationSubmitter();
+    userPassword = containerTokenIdentifier.getApplicationsSubmitterPassword();
     ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
     this.readLock = readWriteLock.readLock();
     this.writeLock = readWriteLock.writeLock();
@@ -376,6 +378,16 @@ public class ContainerImpl implements Container {
     this.readLock.lock();
     try {
       return this.user;
+    } finally {
+      this.readLock.unlock();
+    }
+  }
+
+  @Override
+  public String getUserPassword() {
+    this.readLock.lock();
+    try {
+      return this.userPassword;
     } finally {
       this.readLock.unlock();
     }
