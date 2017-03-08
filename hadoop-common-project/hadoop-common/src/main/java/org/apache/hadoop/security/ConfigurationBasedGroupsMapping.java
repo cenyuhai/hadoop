@@ -97,26 +97,26 @@ public class ConfigurationBasedGroupsMapping
             new InputStreamReader(new FileInputStream(file), Charsets.UTF_8))) {
 
       String line;
-      // user=group1,group2,group3
+      // group1=user1,user2,user3
       while ((line = reader.readLine()) != null) {
 
         if (LOG.isDebugEnabled()) {
           LOG.debug("Loading new group mapping file: Handle " + line);
         }
 
-        Collection<String> userToGroups = StringUtils.getStringCollection(line,
+        Collection<String> groupToUsers = StringUtils.getStringCollection(line,
                 "=");
-        if (userToGroups.size() != 2) {
+        if (groupToUsers.size() != 2) {
           LOG.warn("ignore invalid mapping: " + line);
           continue;
         }
 
-        String[] userToGroupsArray = userToGroups.toArray(new String[userToGroups
+        String[] groupToUsersArray = groupToUsers.toArray(new String[groupToUsers
                 .size()]);
-        String user = userToGroupsArray[0];
-        Set<String> groups = new HashSet<>(StringUtils.getStringCollection(userToGroupsArray[1]));
-
-        newUser2groups.putAll(user, groups);
+        String group = groupToUsersArray[0];
+        for (String user : StringUtils.getStringCollection(groupToUsersArray[1])) {
+          newUser2groups.put(user, group);
+        }
       }
     }
 

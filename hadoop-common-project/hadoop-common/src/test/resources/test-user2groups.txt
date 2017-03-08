@@ -1,4 +1,6 @@
-user0
-user1=
-user2=group1
-user3=group2,group3
+group1=user2
+group2=user3
+group3=user3
+group0
+=user0
+group4=

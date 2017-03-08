@@ -54,6 +54,10 @@ public class TestConfigurationBasedGroupsMapping {
     groups2.contains("group2");
     groups2.contains("group3");
 
+    // test user0
+    Set<String> groups3 = mapping.getGroups("user0");
+    Assert.assertTrue(groups3.isEmpty());
+
     // test
     Set<String> nongroups = mapping.getGroups("notexitsuser");
     Assert.assertTrue(nongroups.isEmpty());
