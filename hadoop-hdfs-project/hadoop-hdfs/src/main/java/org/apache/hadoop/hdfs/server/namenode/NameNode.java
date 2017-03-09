@@ -137,9 +137,8 @@ public class NameNode extends ReconfigurableBase implements NameNodeStatusMXBean
   static final List<String> RECONFIGURABLE_PROPERTIES =
       Collections.unmodifiableList(Arrays.asList(
         FS_PROTECTED_DIRECTORIES,
-        HADOOP_SECURITY_GROUPS_MAPPING_REDIS_IP,
-        HADOOP_SECURITY_USE_WHITELIST,
-        DFS_HEARTBEAT_EXPIRE_INTERVAL_KEY));
+        DFS_HEARTBEAT_EXPIRE_INTERVAL_KEY,
+        DFS_BLOCK_INVALIDATE_LIMIT_KEY));
 
   @Override
   public Collection<String> getReconfigurableProperties() {
@@ -165,6 +164,12 @@ public class NameNode extends ReconfigurableBase implements NameNodeStatusMXBean
             expireMS = Long.parseLong(newVal);
           }
           namesystem.getBlockManager().getDatanodeManager().setHeartbeatExpireInterval(expireMS);
+          break;
+        case DFS_BLOCK_INVALIDATE_LIMIT_KEY:
+          if (newVal != null && !newVal.isEmpty()) {
+            int limit = Integer.parseInt(newVal);
+            namesystem.getBlockManager().getDatanodeManager().setBlockInvalidateLimit(limit);
+          }
           break;
         default:
           break;
