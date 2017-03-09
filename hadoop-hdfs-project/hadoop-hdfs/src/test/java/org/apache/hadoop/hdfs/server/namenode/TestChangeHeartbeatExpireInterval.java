@@ -57,6 +57,13 @@ public class TestChangeHeartbeatExpireInterval {
               .getDatanodeManager().getHeartbeatExpireInterval();
       Assert.assertEquals(expectExpireMS, expireMS);
 
+      // change block invalidate limit
+      cluster.getNameNode().namesystem.getBlockManager()
+              .getDatanodeManager().setBlockInvalidateLimit(10000);
+      int limit = cluster.getNameNode().namesystem.getBlockManager()
+              .getDatanodeManager().getBlockInvalidateLimit();
+      Assert.assertEquals(10000, limit);
+
     } finally {
       if (cluster != null) {
         cluster.shutdown();

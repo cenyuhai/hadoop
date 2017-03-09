@@ -117,7 +117,7 @@ public class DatanodeManager {
   private final int heartbeatRecheckInterval;
 
   /** Ask Datanode only up to this many blocks to delete. */
-  final int blockInvalidateLimit;
+  volatile int blockInvalidateLimit;
 
   /** The interval for judging stale DataNodes for read/write */
   private final long staleInterval;
@@ -243,10 +243,8 @@ public class DatanodeManager {
 
     final int blockInvalidateLimit = Math.max(20*(int)(heartbeatIntervalSeconds),
         DFSConfigKeys.DFS_BLOCK_INVALIDATE_LIMIT_DEFAULT);
-    this.blockInvalidateLimit = conf.getInt(
-        DFSConfigKeys.DFS_BLOCK_INVALIDATE_LIMIT_KEY, blockInvalidateLimit);
-    LOG.info(DFSConfigKeys.DFS_BLOCK_INVALIDATE_LIMIT_KEY
-        + "=" + this.blockInvalidateLimit);
+    setBlockInvalidateLimit(conf.getInt(
+            DFSConfigKeys.DFS_BLOCK_INVALIDATE_LIMIT_KEY, blockInvalidateLimit));
 
     this.checkIpHostnameInRegistration = conf.getBoolean(
         DFSConfigKeys.DFS_NAMENODE_DATANODE_REGISTRATION_IP_HOSTNAME_CHECK_KEY,
@@ -357,6 +355,18 @@ public class DatanodeManager {
   @VisibleForTesting
   public long getHeartbeatExpireInterval() {
     return this.heartbeatExpireInterval;
+  }
+
+
+  public void setBlockInvalidateLimit(final int limit) {
+    this.blockInvalidateLimit = limit;
+    LOG.info(DFSConfigKeys.DFS_BLOCK_INVALIDATE_LIMIT_KEY
+            + "=" + this.blockInvalidateLimit);
+  }
+
+  @VisibleForTesting
+  public int getBlockInvalidateLimit() {
+    return this.blockInvalidateLimit;
   }
 
   @VisibleForTesting
