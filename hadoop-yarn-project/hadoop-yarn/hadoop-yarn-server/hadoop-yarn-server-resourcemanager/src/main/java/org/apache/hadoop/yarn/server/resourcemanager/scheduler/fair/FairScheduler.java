@@ -574,6 +574,7 @@ public class FairScheduler extends
    * user. This will accept a new app even if the user or queue is above
    * configured limits, but the app will not be marked as runnable.
    */
+  @Deprecated
   protected synchronized void addApplication(ApplicationId applicationId,
                                              String queueName, String user, boolean isAppRecovering) {
     addApplication(applicationId, queueName, user, null, isAppRecovering);

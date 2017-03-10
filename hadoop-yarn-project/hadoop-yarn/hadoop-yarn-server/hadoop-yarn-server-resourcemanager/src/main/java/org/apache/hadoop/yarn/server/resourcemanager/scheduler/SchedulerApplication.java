@@ -31,11 +31,13 @@ public class SchedulerApplication<T extends SchedulerApplicationAttempt> {
   private final String userPassword;
   private T currentAttempt;
   private final Priority priority;
- 
+
+  @Deprecated
   public SchedulerApplication(Queue queue, String user) {
     this(queue, user, Priority.newInstance(1));
   }
 
+  @Deprecated
   public SchedulerApplication(Queue queue, String user, Priority priority) {
     this(queue, user, null, priority);
   }

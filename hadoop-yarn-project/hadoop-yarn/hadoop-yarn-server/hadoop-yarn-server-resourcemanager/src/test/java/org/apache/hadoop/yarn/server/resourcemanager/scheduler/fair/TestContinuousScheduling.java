@@ -99,7 +99,7 @@ public class TestContinuousScheduling extends FairSchedulerTestBase {
         createAppAttemptId(this.APP_ID++, this.ATTEMPT_ID++);
     createMockRMApp(appAttemptId);
 
-    scheduler.addApplication(appAttemptId.getApplicationId(), "queue11", "user11", false);
+    scheduler.addApplication(appAttemptId.getApplicationId(), "queue11", "user11", "password11", false);
     scheduler.addApplicationAttempt(appAttemptId, false, false);
     List<ResourceRequest> ask = new ArrayList<>();
     ask.add(createResourceRequest(1024, 1, ResourceRequest.ANY, 1, 1, true));
