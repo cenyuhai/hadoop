@@ -89,6 +89,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
+import org.mockito.Mock;
 
 
 @RunWith(value = Parameterized.class)
@@ -245,6 +246,7 @@ public class TestRMAppTransitions {
   protected RMApp createNewTestApp(ApplicationSubmissionContext submissionContext) {
     ApplicationId applicationId = MockApps.newAppID(appId++);
     String user = MockApps.newUserName();
+    String password = MockApps.newUserPassword();
     String name = MockApps.newAppName();
     String queue = MockApps.newQueue();
     // ensure max application attempts set to known value
@@ -262,11 +264,11 @@ public class TestRMAppTransitions {
     submissionContext.setApplicationId(applicationId);
 
     RMApp application =
-        new RMAppImpl(applicationId, rmContext, conf, name, user, queue,
+        new RMAppImpl(applicationId, rmContext, conf, name, user, password, queue,
           submissionContext, scheduler, masterService,
           System.currentTimeMillis(), "YARN", null, null);
 
-    testAppStartState(applicationId, user, name, queue, application);
+    testAppStartState(applicationId, user, password, name, queue, application);
     this.rmContext.getRMApps().putIfAbsent(application.getApplicationId(),
         application);
     return application;
@@ -274,13 +276,15 @@ public class TestRMAppTransitions {
 
   // Test expected newly created app state
   private static void testAppStartState(ApplicationId applicationId, 
-      String user, String name, String queue, RMApp application) {
+      String user, String userPassword, String name, String queue, RMApp application) {
     Assert.assertTrue("application start time is not greater then 0", 
         application.getStartTime() > 0);
     Assert.assertTrue("application start time is before currentTime", 
         application.getStartTime() <= System.currentTimeMillis());
     Assert.assertEquals("application user is not correct",
         user, application.getUser());
+    Assert.assertEquals("application user' password is not correct",
+        userPassword, application.getUserPassword());
     Assert.assertEquals("application id is not correct",
         applicationId, application.getApplicationId());
     Assert.assertEquals("application progress is not correct",
@@ -982,7 +986,7 @@ public class TestRMAppTransitions {
         new RMAppImpl(
             appState.getApplicationSubmissionContext().getApplicationId(),
             rmContext, conf,
-            submissionContext.getApplicationName(), null,
+            submissionContext.getApplicationName(), null, null,
             submissionContext.getQueue(), submissionContext, null, null,
             appState.getSubmitTime(), submissionContext.getApplicationType(),
             submissionContext.getApplicationTags(),

@@ -273,6 +273,7 @@ public class RMAppManager implements EventHandler<RMAppManagerEvent>,
   }
 
   @SuppressWarnings("unchecked")
+  @Deprecated
   protected void submitApplication(
       ApplicationSubmissionContext submissionContext, long submitTime,
       String user) throws YarnException {

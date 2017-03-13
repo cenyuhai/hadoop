@@ -1223,7 +1223,7 @@ public class TestClientRMService {
     when(asContext.getMaxAppAttempts()).thenReturn(1);
 
     RMAppImpl app =
-        spy(new RMAppImpl(applicationId3, rmContext, config, null, null,
+        spy(new RMAppImpl(applicationId3, rmContext, config, null, null, null,
             queueName, asContext, yarnScheduler, null,
             System.currentTimeMillis(), "YARN", null,
             BuilderUtils.newResourceRequest(

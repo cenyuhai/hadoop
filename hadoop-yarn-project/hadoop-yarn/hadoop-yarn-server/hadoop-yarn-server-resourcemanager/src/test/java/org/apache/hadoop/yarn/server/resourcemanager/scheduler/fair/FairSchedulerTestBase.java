@@ -219,7 +219,7 @@ public class FairSchedulerTestBase {
       String queue, String user, String userPassword, Resource amResource) {
     RMContext rmContext = resourceManager.getRMContext();
     RMApp rmApp = new RMAppImpl(attId.getApplicationId(), rmContext, conf,
-        null, null, null, ApplicationSubmissionContext.newInstance(null, null,
+        null, null, null, null, ApplicationSubmissionContext.newInstance(null, null,
         null, null, null, false, false, 0, amResource, null), null, null,
         0, null, null, null);
     rmContext.getRMApps().put(attId.getApplicationId(), rmApp);

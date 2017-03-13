@@ -144,11 +144,11 @@ public class RMHATestBase extends ClientBaseWithFixes{
     @Override
     protected void submitApplication(
         ApplicationSubmissionContext submissionContext, long submitTime,
-        String user) throws YarnException {
+        String user, String userPassword) throws YarnException {
       //Do nothing, just add the application to RMContext
       RMAppImpl application =
           new RMAppImpl(submissionContext.getApplicationId(), this.rmContext,
-              this.conf, submissionContext.getApplicationName(), user,
+              this.conf, submissionContext.getApplicationName(), user, userPassword,
               submissionContext.getQueue(), submissionContext,
               this.rmContext.getScheduler(),
               this.rmContext.getApplicationMasterService(),

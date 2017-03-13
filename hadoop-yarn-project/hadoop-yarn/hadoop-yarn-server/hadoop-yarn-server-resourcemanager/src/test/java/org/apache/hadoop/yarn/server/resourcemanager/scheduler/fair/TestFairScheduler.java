@@ -2998,7 +2998,7 @@ public class TestFairScheduler extends FairSchedulerTestBase {
     submissionContext.setApplicationId(applicationId);
     submissionContext.setAMContainerSpec(clc);
     RMApp application =
-        new RMAppImpl(applicationId, resourceManager.getRMContext(), conf, name, user, 
+        new RMAppImpl(applicationId, resourceManager.getRMContext(), conf, name, user, password,
           queue, submissionContext, scheduler, masterService,
           System.currentTimeMillis(), "YARN", null, null);
     resourceManager.getRMContext().getRMApps().putIfAbsent(applicationId, application);
