@@ -947,7 +947,7 @@ public class TestFairScheduler extends FairSchedulerTestBase {
     scheduler.start();
     scheduler.reinitialize(conf, resourceManager.getRMContext());
     ApplicationAttemptId appAttemptId = createAppAttemptId(1, 1);
-    createApplicationWithAMResource(appAttemptId, "default", "user1", null);
+    createApplicationWithAMResource(appAttemptId, "default", "user1", "password1", null);
     assertEquals(1, scheduler.getQueueManager().getLeafQueue("user1", true)
         .getNumRunnableApps());
     assertEquals(0, scheduler.getQueueManager().getLeafQueue("default", true)
@@ -963,7 +963,7 @@ public class TestFairScheduler extends FairSchedulerTestBase {
     scheduler.start();
     scheduler.reinitialize(conf, resourceManager.getRMContext());
     ApplicationAttemptId appAttemptId = createAppAttemptId(1, 1);
-    createApplicationWithAMResource(appAttemptId, "default", "user2", null);
+    createApplicationWithAMResource(appAttemptId, "default", "user2", "password2", null);
     assertEquals(0, scheduler.getQueueManager().getLeafQueue("user1", true)
         .getNumRunnableApps());
     assertEquals(1, scheduler.getQueueManager().getLeafQueue("default", true)
@@ -984,7 +984,7 @@ public class TestFairScheduler extends FairSchedulerTestBase {
     // submit app with empty queue
     ApplicationAttemptId appAttemptId = createAppAttemptId(1, 1);
     AppAddedSchedulerEvent appAddedEvent =
-        new AppAddedSchedulerEvent(appAttemptId.getApplicationId(), "", "user1");
+        new AppAddedSchedulerEvent(appAttemptId.getApplicationId(), "", "user1", "password1");
     scheduler.handle(appAddedEvent);
 
     // submission rejected
@@ -1005,7 +1005,7 @@ public class TestFairScheduler extends FairSchedulerTestBase {
     // submit app with queue name (.A)
     ApplicationAttemptId appAttemptId1 = createAppAttemptId(1, 1);
     AppAddedSchedulerEvent appAddedEvent1 =
-        new AppAddedSchedulerEvent(appAttemptId1.getApplicationId(), ".A", "user1");
+        new AppAddedSchedulerEvent(appAttemptId1.getApplicationId(), ".A", "user1", "password1");
     scheduler.handle(appAddedEvent1);
     // submission rejected
     assertEquals(1, scheduler.getQueueManager().getLeafQueues().size());
@@ -1015,7 +1015,7 @@ public class TestFairScheduler extends FairSchedulerTestBase {
     // submit app with queue name (A.)
     ApplicationAttemptId appAttemptId2 = createAppAttemptId(2, 1);
     AppAddedSchedulerEvent appAddedEvent2 =
-        new AppAddedSchedulerEvent(appAttemptId2.getApplicationId(), "A.", "user1");
+        new AppAddedSchedulerEvent(appAttemptId2.getApplicationId(), "A.", "user1", "password1");
     scheduler.handle(appAddedEvent2);
     // submission rejected
     assertEquals(1, scheduler.getQueueManager().getLeafQueues().size());
@@ -1025,7 +1025,7 @@ public class TestFairScheduler extends FairSchedulerTestBase {
     // submit app with queue name (A.B)
     ApplicationAttemptId appAttemptId3 = createAppAttemptId(3, 1);
     AppAddedSchedulerEvent appAddedEvent3 =
-        new AppAddedSchedulerEvent(appAttemptId3.getApplicationId(), "A.B", "user1");
+        new AppAddedSchedulerEvent(appAttemptId3.getApplicationId(), "A.B", "user1", "password1");
     scheduler.handle(appAddedEvent3);
     // submission accepted
     assertEquals(2, scheduler.getQueueManager().getLeafQueues().size());
@@ -1367,7 +1367,7 @@ public class TestFairScheduler extends FairSchedulerTestBase {
 
     // Submit one application
     ApplicationAttemptId appAttemptId1 = createAppAttemptId(1, 1);
-    createApplicationWithAMResource(appAttemptId1, "default", "user1", null);
+    createApplicationWithAMResource(appAttemptId1, "default", "user1", "password1", null);
     assertEquals(3072, scheduler.getQueueManager()
         .getLeafQueue("default", false).getSteadyFairShare().getMemory());
     assertEquals(3072, scheduler.getQueueManager()
@@ -1440,7 +1440,7 @@ public class TestFairScheduler extends FairSchedulerTestBase {
     scheduler.reinitialize(conf, resourceManager.getRMContext());
     ApplicationAttemptId attemptId =createAppAttemptId(1, 1);
     AppAddedSchedulerEvent appAddedEvent = new AppAddedSchedulerEvent(attemptId.getApplicationId(), "default",
-      "user1");
+      "user1", "password1");
     scheduler.handle(appAddedEvent);
     AppAttemptAddedSchedulerEvent attemptAddedEvent =
         new AppAttemptAddedSchedulerEvent(createAppAttemptId(1, 1), false);
@@ -2200,7 +2200,7 @@ public class TestFairScheduler extends FairSchedulerTestBase {
 
     // User1 submits one application
     ApplicationAttemptId appAttemptId = createAppAttemptId(1, 1);
-    createApplicationWithAMResource(appAttemptId, "default", "user1", null);
+    createApplicationWithAMResource(appAttemptId, "default", "user1", "password1", null);
 
     // The user1 queue should inherit the configurations from the root queue
     FSLeafQueue userQueue =
@@ -3523,7 +3523,7 @@ public class TestFairScheduler extends FairSchedulerTestBase {
     int amPriority = RMAppAttemptImpl.AM_CONTAINER_PRIORITY.getPriority();
     // Exceeds no limits
     ApplicationAttemptId attId1 = createAppAttemptId(1, 1);
-    createApplicationWithAMResource(attId1, "queue1", "user1", amResource1);
+    createApplicationWithAMResource(attId1, "queue1", "user1", "password1", amResource1);
     createSchedulingRequestExistingApplication(1024, 1, amPriority, attId1);
     FSAppAttempt app1 = scheduler.getSchedulerApp(attId1);
     scheduler.update();
@@ -3537,7 +3537,7 @@ public class TestFairScheduler extends FairSchedulerTestBase {
 
     // Exceeds no limits
     ApplicationAttemptId attId2 = createAppAttemptId(2, 1);
-    createApplicationWithAMResource(attId2, "queue1", "user1", amResource1);
+    createApplicationWithAMResource(attId2, "queue1", "user1", "password1", amResource1);
     createSchedulingRequestExistingApplication(1024, 1, amPriority, attId2);
     FSAppAttempt app2 = scheduler.getSchedulerApp(attId2);
     scheduler.update();
@@ -3551,7 +3551,7 @@ public class TestFairScheduler extends FairSchedulerTestBase {
 
     // Exceeds queue limit
     ApplicationAttemptId attId3 = createAppAttemptId(3, 1);
-    createApplicationWithAMResource(attId3, "queue1", "user1", amResource1);
+    createApplicationWithAMResource(attId3, "queue1", "user1", "password1", amResource1);
     createSchedulingRequestExistingApplication(1024, 1, amPriority, attId3);
     FSAppAttempt app3 = scheduler.getSchedulerApp(attId3);
     scheduler.update();
@@ -3587,7 +3587,7 @@ public class TestFairScheduler extends FairSchedulerTestBase {
 
     // Exceeds queue limit
     ApplicationAttemptId attId4 = createAppAttemptId(4, 1);
-    createApplicationWithAMResource(attId4, "queue1", "user1", amResource2);
+    createApplicationWithAMResource(attId4, "queue1", "user1", "password1", amResource2);
     createSchedulingRequestExistingApplication(2048, 2, amPriority, attId4);
     FSAppAttempt app4 = scheduler.getSchedulerApp(attId4);
     scheduler.update();
@@ -3601,7 +3601,7 @@ public class TestFairScheduler extends FairSchedulerTestBase {
 
     // Exceeds queue limit
     ApplicationAttemptId attId5 = createAppAttemptId(5, 1);
-    createApplicationWithAMResource(attId5, "queue1", "user1", amResource2);
+    createApplicationWithAMResource(attId5, "queue1", "user1", "password1", amResource2);
     createSchedulingRequestExistingApplication(2048, 2, amPriority, attId5);
     FSAppAttempt app5 = scheduler.getSchedulerApp(attId5);
     scheduler.update();
@@ -3644,7 +3644,7 @@ public class TestFairScheduler extends FairSchedulerTestBase {
 
     // Check amResource normalization
     ApplicationAttemptId attId6 = createAppAttemptId(6, 1);
-    createApplicationWithAMResource(attId6, "queue1", "user1", amResource3);
+    createApplicationWithAMResource(attId6, "queue1", "user1", "password1", amResource3);
     createSchedulingRequestExistingApplication(1860, 2, amPriority, attId6);
     FSAppAttempt app6 = scheduler.getSchedulerApp(attId6);
     scheduler.update();
@@ -3736,7 +3736,7 @@ public class TestFairScheduler extends FairSchedulerTestBase {
     // The fair share is 2048 MB, and the default maxAMShare is 0.5f,
     // so the AM is accepted.
     ApplicationAttemptId attId1 = createAppAttemptId(1, 1);
-    createApplicationWithAMResource(attId1, "queue1", "test1", amResource1);
+    createApplicationWithAMResource(attId1, "queue1", "test1", "password1", amResource1);
     createSchedulingRequestExistingApplication(1024, 1, amPriority, attId1);
     FSAppAttempt app1 = scheduler.getSchedulerApp(attId1);
     scheduler.update();
@@ -3751,7 +3751,7 @@ public class TestFairScheduler extends FairSchedulerTestBase {
     // Now the fair share is 1639 MB, and the maxAMShare is 0.4f,
     // so the AM is not accepted.
     ApplicationAttemptId attId2 = createAppAttemptId(2, 1);
-    createApplicationWithAMResource(attId2, "queue2", "test1", amResource1);
+    createApplicationWithAMResource(attId2, "queue2", "test1", "password1", amResource1);
     createSchedulingRequestExistingApplication(1024, 1, amPriority, attId2);
     FSAppAttempt app2 = scheduler.getSchedulerApp(attId2);
     scheduler.update();

@@ -91,11 +91,12 @@ public abstract class TestSchedulerPlanFollowerBase {
     assertReservationQueueExists(r1);
     // submit an app to r1
     String user_0 = "test-user";
+    String password_0 = "test-password";
     ApplicationId appId = ApplicationId.newInstance(0, 1);
     ApplicationAttemptId appAttemptId_0 =
         ApplicationAttemptId.newInstance(appId, 0);
     AppAddedSchedulerEvent addAppEvent =
-        new AppAddedSchedulerEvent(appId, q.getQueueName(), user_0);
+        new AppAddedSchedulerEvent(appId, q.getQueueName(), user_0, password_0);
     scheduler.handle(addAppEvent);
     AppAttemptAddedSchedulerEvent appAttemptAddedEvent =
         new AppAttemptAddedSchedulerEvent(appAttemptId_0, false);

@@ -744,13 +744,14 @@ public class TestSchedulerUtils {
     ApplicationId appId =
         ApplicationId.newInstance(System.currentTimeMillis(), 1);
     AppAddedSchedulerEvent appAddedEvent =
-        new AppAddedSchedulerEvent(appId, queueName, "user");
+        new AppAddedSchedulerEvent(appId, queueName, "user", "password");
     handler.handle(appAddedEvent);
     SchedulerApplication<SchedulerApplicationAttempt> app =
         applications.get(appId);
     // verify application is added.
     Assert.assertNotNull(app);
     Assert.assertEquals("user", app.getUser());
+    Assert.assertEquals("password", app.getUserPassword());
 
     AppRemovedSchedulerEvent appRemoveEvent =
         new AppRemovedSchedulerEvent(appId, RMAppState.FINISHED);

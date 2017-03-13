@@ -169,7 +169,7 @@ public class Application {
 
     // Notify scheduler
     AppAddedSchedulerEvent addAppEvent =
-        new AppAddedSchedulerEvent(this.applicationId, this.queue, "user");
+        new AppAddedSchedulerEvent(this.applicationId, this.queue, "user", "password");
     scheduler.handle(addAppEvent);
     AppAttemptAddedSchedulerEvent addAttemptEvent =
         new AppAttemptAddedSchedulerEvent(this.applicationAttemptId, false);
