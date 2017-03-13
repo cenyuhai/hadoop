@@ -45,7 +45,7 @@ import com.google.protobuf.TextFormat;
 @Unstable
 public class ContainerLaunchContextPBImpl 
 extends ContainerLaunchContext {
-  ContainerLaunchContextProto proto = 
+  ContainerLaunchContextProto proto =
       ContainerLaunchContextProto.getDefaultInstance();
   ContainerLaunchContextProto.Builder builder = null;
   boolean viaProto = false;

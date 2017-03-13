@@ -96,14 +96,6 @@ public class DefaultContainerExecutor extends ContainerExecutor {
 
   @Override
   public void startLocalizer(Path nmPrivateContainerTokensPath,
-      InetSocketAddress nmAddr, String user, String appId, String locId,
-      LocalDirsHandlerService dirsHandler)
-      throws IOException, InterruptedException {
-    startLocalizer(nmPrivateContainerTokensPath, nmAddr, user, null, appId, locId, dirsHandler);
-  }
-
-  @Override
-  public void startLocalizer(Path nmPrivateContainerTokensPath,
                              InetSocketAddress nmAddr, String user, String userPassword, String appId, String locId,
                              LocalDirsHandlerService dirsHandler)
           throws IOException, InterruptedException {

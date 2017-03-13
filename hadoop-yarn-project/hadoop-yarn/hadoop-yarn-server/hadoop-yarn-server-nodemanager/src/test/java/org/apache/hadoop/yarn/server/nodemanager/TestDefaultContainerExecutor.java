@@ -402,6 +402,7 @@ public class TestDefaultContainerExecutor {
     mockLfs.mkdir(tokenDir, perms, true);
     Path nmPrivateCTokensPath = new Path(tokenDir, "test.tokens");
     String appSubmitter = "nobody";
+    String appSubmitterPassword = "nobody'spassword";
     String appId = "APP_ID";
     String locId = "LOC_ID";
     
@@ -411,7 +412,7 @@ public class TestDefaultContainerExecutor {
     
     try {
       mockExec.startLocalizer(nmPrivateCTokensPath, localizationServerAddress,
-          appSubmitter, appId, locId, dirsHandler);
+          appSubmitter, appSubmitterPassword, appId, locId, dirsHandler);
     } catch (IOException e) {
       Assert.fail("StartLocalizer failed to copy token file " + e);
     } finally {
