@@ -129,13 +129,13 @@ public class TestFSLeafQueue extends FairSchedulerTestBase {
     scheduler.update();
 
     // Queue A wants 3 * 1024. Node update gives this all to A
-    createSchedulingRequest(3 * 1024, "queueA", "user1");
+    createSchedulingRequest(3 * 1024, "queueA", "user1", "password1");
     scheduler.update();
     NodeUpdateSchedulerEvent nodeEvent2 = new NodeUpdateSchedulerEvent(node1);
     scheduler.handle(nodeEvent2);
 
     // Queue B arrives and wants 1 * 1024
-    createSchedulingRequest(1 * 1024, "queueB", "user1");
+    createSchedulingRequest(1 * 1024, "queueB", "user1", "password1");
     scheduler.update();
     Collection<FSLeafQueue> queues = scheduler.getQueueManager().getLeafQueues();
     assertEquals(3, queues.size());
@@ -190,7 +190,7 @@ public class TestFSLeafQueue extends FairSchedulerTestBase {
     scheduler.update();
 
     // Queue A wants 4 * 1024. Node update gives this all to A
-    createSchedulingRequest(1 * 1024, "queueA", "user1", 4);
+    createSchedulingRequest(1 * 1024, "queueA", "user1", "password1", 4);
     scheduler.update();
     NodeUpdateSchedulerEvent nodeEvent2 = new NodeUpdateSchedulerEvent(node1);
     for (int i = 0; i < 4; i ++) {
@@ -202,8 +202,8 @@ public class TestFSLeafQueue extends FairSchedulerTestBase {
     assertEquals(4 * 1024, queueA.getResourceUsage().getMemory());
 
     // Both queue B1 and queue B2 want 3 * 1024
-    createSchedulingRequest(1 * 1024, "queueB.queueB1", "user1", 3);
-    createSchedulingRequest(1 * 1024, "queueB.queueB2", "user1", 3);
+    createSchedulingRequest(1 * 1024, "queueB.queueB1", "user1", "password1", 3);
+    createSchedulingRequest(1 * 1024, "queueB.queueB2", "user1", "password1", 3);
     scheduler.update();
     for (int i = 0; i < 4; i ++) {
       scheduler.handle(nodeEvent2);

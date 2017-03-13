@@ -2620,7 +2620,7 @@ public class TestFairScheduler extends FairSchedulerTestBase {
     scheduler.handle(nodeEvent1);
 
     ApplicationAttemptId attId = createSchedulingRequest(1024, 4, "queue1",
-        "user1", 1, 2);
+        "user1", "password1", 1, 2);
     scheduler.update();
     NodeUpdateSchedulerEvent updateEvent = new NodeUpdateSchedulerEvent(node1);
     scheduler.handle(updateEvent);
@@ -2695,9 +2695,9 @@ public class TestFairScheduler extends FairSchedulerTestBase {
     scheduler.start();
     scheduler.reinitialize(conf, resourceManager.getRMContext());
 
-    ApplicationAttemptId attId1 = createSchedulingRequest(1024, "queue1",
+    ApplicationAttemptId attId1 = createSchedulingRequest(1024, "queue1", "password1",
         "norealuserhasthisname", 1);
-    ApplicationAttemptId attId2 = createSchedulingRequest(1024, "queue1",
+    ApplicationAttemptId attId2 = createSchedulingRequest(1024, "queue1", "password1",
         "norealuserhasthisname2", 1);
 
     FSAppAttempt app1 = scheduler.getSchedulerApp(attId1);
@@ -2824,7 +2824,7 @@ public class TestFairScheduler extends FairSchedulerTestBase {
     scheduler.handle(nodeEvent);
 
     ApplicationAttemptId attId =
-        createSchedulingRequest(1024, "root.default", "user", 8);
+        createSchedulingRequest(1024, "root.default", "user", "password", 8);
     FSAppAttempt app = scheduler.getSchedulerApp(attId);
 
     // set maxAssign to 2: only 2 containers should be allocated
@@ -2859,7 +2859,7 @@ public class TestFairScheduler extends FairSchedulerTestBase {
     scheduler.handle(nodeEvent);
 
     ApplicationAttemptId attId =
-        createSchedulingRequest(0, 1, "root.default", "user", 8);
+        createSchedulingRequest(0, 1, "root.default", "user", "password", 8);
     FSAppAttempt app = scheduler.getSchedulerApp(attId);
 
     // set maxAssign to 2: only 2 containers should be allocated
@@ -2897,6 +2897,7 @@ public class TestFairScheduler extends FairSchedulerTestBase {
     scheduler.reinitialize(conf, resourceManager.getRMContext());
 
     final String user = "user1";
+    final String password = "password1";
     final String fifoQueue = "fifo";
     final String fairParent = "fairParent";
     final String fairChild1 = fairParent + ".fairChild1";
@@ -2916,13 +2917,13 @@ public class TestFairScheduler extends FairSchedulerTestBase {
     scheduler.handle(nodeEvent2);
 
     ApplicationAttemptId attId1 =
-        createSchedulingRequest(1024, fifoQueue, user, 4);
+        createSchedulingRequest(1024, fifoQueue, user, password, 4);
     ApplicationAttemptId attId2 =
-        createSchedulingRequest(1024, fairChild1, user, 4);
+        createSchedulingRequest(1024, fairChild1, user, password, 4);
     ApplicationAttemptId attId3 =
-        createSchedulingRequest(1024, fairChild2, user, 4);
+        createSchedulingRequest(1024, fairChild2, user, password, 4);
     ApplicationAttemptId attId4 =
-        createSchedulingRequest(1024, fifoQueue, user, 4);
+        createSchedulingRequest(1024, fifoQueue, user, password, 4);
 
     FSAppAttempt app1 = scheduler.getSchedulerApp(attId1);
     FSAppAttempt app2 = scheduler.getSchedulerApp(attId2);

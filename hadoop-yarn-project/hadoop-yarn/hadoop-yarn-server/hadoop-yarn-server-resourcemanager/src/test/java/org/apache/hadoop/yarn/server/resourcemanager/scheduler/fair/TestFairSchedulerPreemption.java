@@ -108,7 +108,7 @@ public class TestFairSchedulerPreemption extends FairSchedulerTestBase {
     assertEquals("Incorrect amount of resources in the cluster",
         vcores, scheduler.rootMetrics.getAvailableVirtualCores());
 
-    createSchedulingRequest(appMemory, "queueA", "user1", appContainers);
+    createSchedulingRequest(appMemory, "queueA", "user1", "password1", appContainers);
     scheduler.update();
     // Sufficient node check-ins to fully schedule containers
     for (int i = 0; i < 3; i++) {
@@ -146,7 +146,7 @@ public class TestFairSchedulerPreemption extends FairSchedulerTestBase {
     registerNodeAndSubmitApp(4 * 1024, 4, 2, 1024);
 
     // Verify submitting another request triggers preemption
-    createSchedulingRequest(1024, "queueB", "user1", 1, 1);
+    createSchedulingRequest(1024, "queueB", "user1", "password1", 1, 1);
     scheduler.update();
     clock.tick(6);
 
@@ -162,7 +162,7 @@ public class TestFairSchedulerPreemption extends FairSchedulerTestBase {
     registerNodeAndSubmitApp(4 * 1024, 4, 3, 1024);
 
     // Verify submitting another request doesn't trigger preemption
-    createSchedulingRequest(1024, "queueB", "user1", 1, 1);
+    createSchedulingRequest(1024, "queueB", "user1", "password1", 1, 1);
     scheduler.update();
     clock.tick(6);
 
@@ -178,7 +178,7 @@ public class TestFairSchedulerPreemption extends FairSchedulerTestBase {
     registerNodeAndSubmitApp(4 * 1024, 4, 3, 1024);
 
     // Verify submitting another request triggers preemption
-    createSchedulingRequest(1024, "queueB", "user1", 1, 1);
+    createSchedulingRequest(1024, "queueB", "user1", "password1", 1, 1);
     scheduler.update();
     clock.tick(6);
 

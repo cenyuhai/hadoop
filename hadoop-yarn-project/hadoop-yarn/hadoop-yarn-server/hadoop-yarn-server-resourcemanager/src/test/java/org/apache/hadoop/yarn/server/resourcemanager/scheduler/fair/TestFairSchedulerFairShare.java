@@ -129,7 +129,7 @@ public class TestFairSchedulerFairShare extends FairSchedulerTestBase {
     // since it is the only active queue.
     // Also verify if fair share is 0 for childA2. since no app is
     // running in it.
-    createSchedulingRequest(2 * 1024, "root.parentA.childA1", "user1");
+    createSchedulingRequest(2 * 1024, "root.parentA.childA1", "user1", "password1");
 
     scheduler.update();
 
@@ -155,9 +155,9 @@ public class TestFairSchedulerFairShare extends FairSchedulerTestBase {
     createClusterWithQueuesAndOneNode(nodeCapacity, "fair");
 
     // Run apps in childA1,childA2,childA3
-    createSchedulingRequest(2 * 1024, "root.parentA.childA1", "user1");
-    createSchedulingRequest(2 * 1024, "root.parentA.childA2", "user2");
-    createSchedulingRequest(2 * 1024, "root.parentA.childA3", "user3");
+    createSchedulingRequest(2 * 1024, "root.parentA.childA1", "user1", "password1");
+    createSchedulingRequest(2 * 1024, "root.parentA.childA2", "user2", "password2");
+    createSchedulingRequest(2 * 1024, "root.parentA.childA3", "user3", "password3");
 
     scheduler.update();
 
@@ -182,14 +182,14 @@ public class TestFairSchedulerFairShare extends FairSchedulerTestBase {
     createClusterWithQueuesAndOneNode(nodeCapacity, "fair");
 
     // Run apps in childA1,childA2 which are under parentA
-    createSchedulingRequest(2 * 1024, "root.parentA.childA1", "user1");
-    createSchedulingRequest(3 * 1024, "root.parentA.childA2", "user2");
+    createSchedulingRequest(2 * 1024, "root.parentA.childA1", "user1", "password1");
+    createSchedulingRequest(3 * 1024, "root.parentA.childA2", "user2", "password2");
 
     // Run app in childB1 which is under parentB
-    createSchedulingRequest(1 * 1024, "root.parentB.childB1", "user3");
+    createSchedulingRequest(1 * 1024, "root.parentB.childB1", "user3", "password3");
 
     // Run app in root.default queue
-    createSchedulingRequest(1 * 1024, "root.default", "user4");
+    createSchedulingRequest(1 * 1024, "root.default", "user4", "password4");
 
     scheduler.update();
 
@@ -224,9 +224,9 @@ public class TestFairSchedulerFairShare extends FairSchedulerTestBase {
 
     // Run apps in childA1,childA2 which are under parentA
     ApplicationAttemptId app1 = createSchedulingRequest(2 * 1024,
-        "root.parentA.childA1", "user1");
+        "root.parentA.childA1", "user1", "password1");
     ApplicationAttemptId app2 = createSchedulingRequest(3 * 1024,
-        "root.parentA.childA2", "user2");
+        "root.parentA.childA2", "user2", "password2");
 
     scheduler.update();
 
@@ -275,14 +275,14 @@ public class TestFairSchedulerFairShare extends FairSchedulerTestBase {
     createClusterWithQueuesAndOneNode(nodeMem, nodeVCores, "drf");
 
     // Run apps in childA1,childA2 which are under parentA
-    createSchedulingRequest(2 * 1024, "root.parentA.childA1", "user1");
-    createSchedulingRequest(3 * 1024, "root.parentA.childA2", "user2");
+    createSchedulingRequest(2 * 1024, "root.parentA.childA1", "user1", "password1");
+    createSchedulingRequest(3 * 1024, "root.parentA.childA2", "user2", "password2");
 
     // Run app in childB1 which is under parentB
-    createSchedulingRequest(1 * 1024, "root.parentB.childB1", "user3");
+    createSchedulingRequest(1 * 1024, "root.parentB.childB1", "user3", "password3");
 
     // Run app in root.default queue
-    createSchedulingRequest(1 * 1024, "root.default", "user4");
+    createSchedulingRequest(1 * 1024, "root.default", "user4", "password4");
 
     scheduler.update();
 
