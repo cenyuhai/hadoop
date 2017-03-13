@@ -384,7 +384,7 @@ public class TestFSRMStateStore extends RMStateStoreTestBase {
           try {
             store.storeApplicationStateInternal(
                 ApplicationId.newInstance(100L, 1),
-                ApplicationStateData.newInstance(111, 111, "user", null,
+                ApplicationStateData.newInstance(111, 111, "user", "password", null,
                     RMAppState.ACCEPTED, "diagnostics", 333));
           } catch (Exception e) {
             assertionFailedInThread.set(true);

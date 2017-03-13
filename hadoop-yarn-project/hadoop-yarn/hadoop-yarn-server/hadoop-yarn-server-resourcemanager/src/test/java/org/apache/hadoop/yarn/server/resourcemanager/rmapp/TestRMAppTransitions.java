@@ -402,7 +402,7 @@ public class TestRMAppTransitions {
     // NEW => SUBMITTED event RMAppEventType.RECOVER
     RMState state = new RMState();
     ApplicationStateData appState =
-        ApplicationStateData.newInstance(123, 123, null, "user");
+        ApplicationStateData.newInstance(123, 123, null, "user", "password");
     state.getApplicationState().put(application.getApplicationId(), appState);
     RMAppEvent event =
         new RMAppRecoverEvent(application.getApplicationId(), state);
@@ -1015,7 +1015,7 @@ public class TestRMAppTransitions {
     RMApp app = createNewTestApp(null);
     ApplicationStateData appState =
         ApplicationStateData.newInstance(app.getSubmitTime(), app.getStartTime(),
-            app.getUser(), app.getApplicationSubmissionContext(), rmAppState,
+            app.getUser(), app.getUserPassword(), app.getApplicationSubmissionContext(), rmAppState,
             null, app.getFinishTime());
     applicationState.put(app.getApplicationId(), appState);
   }

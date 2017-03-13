@@ -156,6 +156,7 @@ public class RMStateStoreTestBase extends ClientBaseWithFixes{
     when(mockApp.getStartTime()).thenReturn(startTime);
     when(mockApp.getApplicationSubmissionContext()).thenReturn(context);
     when(mockApp.getUser()).thenReturn("test");
+    when(mockApp.getUserPassword()).thenReturn("testpassword");
     store.storeNewApplication(mockApp);
     return mockApp;
   }
@@ -263,6 +264,7 @@ public class RMStateStoreTestBase extends ClientBaseWithFixes{
     when(mockRemovedApp.getApplicationSubmissionContext()).thenReturn(context);
     when(mockRemovedApp.getAppAttempts()).thenReturn(attempts);
     when(mockRemovedApp.getUser()).thenReturn("user1");
+    when(mockRemovedApp.getUserPassword()).thenReturn("password1");
     RMAppAttempt mockRemovedAttempt = mock(RMAppAttempt.class);
     when(mockRemovedAttempt.getAppAttemptId()).thenReturn(attemptIdRemoved);
     when(mockRemovedAttempt.getRMAppAttemptMetrics())
@@ -329,7 +331,7 @@ public class RMStateStoreTestBase extends ClientBaseWithFixes{
     //******* update application/attempt state *******//
     ApplicationStateData appState2 =
         ApplicationStateData.newInstance(appState.getSubmitTime(),
-            appState.getStartTime(), appState.getUser(),
+            appState.getStartTime(), appState.getUser(), appState.getUserPassword(),
             appState.getApplicationSubmissionContext(), RMAppState.FINISHED,
             "appDiagnostics", 1234);
     appState2.attempts.putAll(appState.attempts);
@@ -355,7 +357,7 @@ public class RMStateStoreTestBase extends ClientBaseWithFixes{
     dummyContext.setApplicationId(dummyAppId);
     ApplicationStateData dummyApp =
         ApplicationStateData.newInstance(appState.getSubmitTime(),
-            appState.getStartTime(), appState.getUser(), dummyContext,
+            appState.getStartTime(), appState.getUser(), appState.getUserPassword(), dummyContext,
             RMAppState.FINISHED, "appDiagnostics", 1234);
     store.updateApplicationState(dummyApp);
 
@@ -389,6 +391,7 @@ public class RMStateStoreTestBase extends ClientBaseWithFixes{
     assertEquals(appState.getSubmitTime(), updatedAppState.getSubmitTime());
     assertEquals(appState.getStartTime(), updatedAppState.getStartTime());
     assertEquals(appState.getUser(), updatedAppState.getUser());
+    assertEquals(appState.getUserPassword(), updatedAppState.getUserPassword());
     // new app state fields
     assertEquals( RMAppState.FINISHED, updatedAppState.getState());
     assertEquals("appDiagnostics", updatedAppState.getDiagnostics());

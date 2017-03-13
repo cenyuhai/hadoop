@@ -1031,7 +1031,7 @@ public class RMAppImpl implements RMApp, Recoverable {
     }
     ApplicationStateData appState =
         ApplicationStateData.newInstance(this.submitTime, this.startTime,
-            this.user, this.submissionContext,
+            this.user, this.userPassword, this.submissionContext,
             stateToBeStored, diags, this.storedFinishTime);
     this.rmContext.getStateStore().updateApplicationState(appState);
   }

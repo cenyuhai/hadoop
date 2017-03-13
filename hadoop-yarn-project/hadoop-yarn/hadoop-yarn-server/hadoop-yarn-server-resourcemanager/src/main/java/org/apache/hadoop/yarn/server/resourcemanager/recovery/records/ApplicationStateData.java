@@ -42,13 +42,14 @@ public abstract class ApplicationStateData {
       new HashMap<ApplicationAttemptId, ApplicationAttemptStateData>();
   
   public static ApplicationStateData newInstance(long submitTime,
-      long startTime, String user,
+      long startTime, String user, String userPassword,
       ApplicationSubmissionContext submissionContext,
       RMAppState state, String diagnostics, long finishTime) {
     ApplicationStateData appState = Records.newRecord(ApplicationStateData.class);
     appState.setSubmitTime(submitTime);
     appState.setStartTime(startTime);
     appState.setUser(user);
+    appState.setUserPassword(userPassword);
     appState.setApplicationSubmissionContext(submissionContext);
     appState.setState(state);
     appState.setDiagnostics(diagnostics);
@@ -57,8 +58,8 @@ public abstract class ApplicationStateData {
   }
 
   public static ApplicationStateData newInstance(long submitTime,
-      long startTime, ApplicationSubmissionContext context, String user) {
-    return newInstance(submitTime, startTime, user, context, null, "", 0);
+      long startTime, ApplicationSubmissionContext context, String user, String userPassword) {
+    return newInstance(submitTime, startTime, user, userPassword, context, null, "", 0);
   }
   
   public int getAttemptCount() {
@@ -106,6 +107,17 @@ public abstract class ApplicationStateData {
   @Public
   @Unstable
   public abstract String getUser();
+
+  /**
+   * The application submitter's pasword
+   */
+  @Public
+  @Unstable
+  public abstract void setUserPassword(String userPassword);
+
+  @Public
+  @Unstable
+  public abstract String getUserPassword();
   
   /**
    * The {@link ApplicationSubmissionContext} for the application

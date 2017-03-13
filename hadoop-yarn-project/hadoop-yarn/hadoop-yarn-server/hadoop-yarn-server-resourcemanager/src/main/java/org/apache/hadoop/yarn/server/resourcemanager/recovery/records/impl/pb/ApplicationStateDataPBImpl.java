@@ -113,11 +113,27 @@ public class ApplicationStateDataPBImpl extends ApplicationStateData {
     return (p.getUser());
 
   }
-  
+
   @Override
   public void setUser(String user) {
     maybeInitBuilder();
     builder.setUser(user);
+  }
+
+  @Override
+  public void setUserPassword(String userPassword) {
+    maybeInitBuilder();
+    builder.setUserPassword(userPassword);
+  }
+
+  @Override
+  public String getUserPassword() {
+    ApplicationStateDataProtoOrBuilder p = viaProto ? proto : builder;
+    if (!p.hasUserPassword()) {
+      return null;
+    }
+    return (p.getUserPassword());
+
   }
   
   @Override

@@ -389,6 +389,7 @@ public class TestZKRMStateStore extends RMStateStoreTestBase {
     when(mockApp.getStartTime()).thenReturn(startTime);
     when(mockApp.getApplicationSubmissionContext()).thenReturn(context);
     when(mockApp.getUser()).thenReturn("test");
+    when(mockApp.getUserPassword()).thenReturn("password");
     store.storeNewApplication(mockApp);
     assertEquals("RMStateStore should have been in fenced state",
             true, store.isFencedState());
@@ -431,7 +432,7 @@ public class TestZKRMStateStore extends RMStateStoreTestBase {
 
     // Update app
     ApplicationStateData appState = ApplicationStateData.newInstance(submitTime, 
-            startTime, context, "test");
+            startTime, context, "test", "password");
     store.updateApplicationState(appState);
     assertEquals("RMStateStore should have been in fenced state",
             true, store.isFencedState());
@@ -500,7 +501,7 @@ public class TestZKRMStateStore extends RMStateStoreTestBase {
     context.setApplicationId(appIdRemoved);
     ApplicationStateData appStateRemoved =
         ApplicationStateData.newInstance(
-            submitTime, startTime, context, "user1");
+            submitTime, startTime, context, "user1", "password1");
     appStateRemoved.attempts.put(attemptIdRemoved, null);
     store.removeApplicationStateInternal(appStateRemoved);
     try {
