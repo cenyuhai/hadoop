@@ -49,7 +49,9 @@ public abstract class ApplicationStateData {
     appState.setSubmitTime(submitTime);
     appState.setStartTime(startTime);
     appState.setUser(user);
-    appState.setUserPassword(userPassword);
+    if (userPassword != null) {
+      appState.setUserPassword(userPassword);
+    }
     appState.setApplicationSubmissionContext(submissionContext);
     appState.setState(state);
     appState.setDiagnostics(diagnostics);
