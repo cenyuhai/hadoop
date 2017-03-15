@@ -1599,7 +1599,7 @@ public class UserGroupInformation {
       return result.toArray(new String[result.size()]);
     } catch (IOException ie) {
       if (LOG.isDebugEnabled()) {
-        LOG.warn("No groups available for user " + getShortUserName());
+        LOG.debug("No groups available for user " + getShortUserName());
       }
       return new String[0];
     }
@@ -1616,7 +1616,7 @@ public class UserGroupInformation {
       return groups.getGroups(getShortUserName());
     } catch (IOException ie) {
       if (LOG.isDebugEnabled()) {
-        LOG.warn("No groups available for user " + getShortUserName());
+        LOG.debug("No groups available for user " + getShortUserName());
       }
       return new HashSet<String>();
     }
@@ -1633,7 +1633,7 @@ public class UserGroupInformation {
       return groupSet.contains(supergroup);
     } catch (IOException ie) {
       if (LOG.isDebugEnabled()) {
-        LOG.warn("No groups available for user " + getShortUserName());
+        LOG.debug("No groups available for user " + getShortUserName());
       }
       return false;
     }
@@ -1650,7 +1650,7 @@ public class UserGroupInformation {
       return groupSet.contains(group) || groupSet.contains("*");
     } catch (IOException ie) {
       if (LOG.isDebugEnabled()) {
-        LOG.warn("No groups available for user " + getShortUserName());
+        LOG.debug("No groups available for user " + getShortUserName());
       }
       return false;
     }
