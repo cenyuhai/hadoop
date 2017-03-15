@@ -340,13 +340,15 @@ public class ContainerLocalizer {
    * @param locId localizer id
    * @param nmAddr nodemanager address
    * @param localDirs list of local dirs
+   * @param userPassword user's hadoop password
    */
   public static void buildMainArgs(List<String> command,
-      String user, String appId, String locId,
+      String user, String userPassword, String appId, String locId,
       InetSocketAddress nmAddr, List<String> localDirs) {
     
     command.add(ContainerLocalizer.class.getName());
     command.add(user);
+    command.add(userPassword);
     command.add(appId);
     command.add(locId);
     command.add(nmAddr.getHostName());
@@ -366,11 +368,12 @@ public class ContainerLocalizer {
     // LOAD $x/$user/appcache/$appid/appTokens
     try {
       String user = argv[0];
-      String appId = argv[1];
-      String locId = argv[2];
+      String userPassword = argv[1];
+      String appId = argv[2];
+      String locId = argv[3];
       InetSocketAddress nmAddr =
-          new InetSocketAddress(argv[3], Integer.parseInt(argv[4]));
-      String[] sLocaldirs = Arrays.copyOfRange(argv, 5, argv.length);
+          new InetSocketAddress(argv[4], Integer.parseInt(argv[5]));
+      String[] sLocaldirs = Arrays.copyOfRange(argv, 6, argv.length);
       ArrayList<Path> localDirs = new ArrayList<Path>(sLocaldirs.length);
       for (String sLocaldir : sLocaldirs) {
         localDirs.add(new Path(sLocaldir));
@@ -384,7 +387,7 @@ public class ContainerLocalizer {
       }
 
       ContainerLocalizer localizer =
-          new ContainerLocalizer(FileContext.getLocalFSFileContext(), user,
+          new ContainerLocalizer(FileContext.getLocalFSFileContext(), user, userPassword,
               appId, locId, localDirs,
               RecordFactoryProvider.getRecordFactory(null));
       int nRet = localizer.runLocalization(nmAddr);
