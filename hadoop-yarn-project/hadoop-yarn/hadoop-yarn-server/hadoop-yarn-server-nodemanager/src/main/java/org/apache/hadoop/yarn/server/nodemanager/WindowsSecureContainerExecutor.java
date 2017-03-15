@@ -698,7 +698,7 @@ public class WindowsSecureContainerExecutor extends DefaultContainerExecutor {
        command.add("-Djava.library.path=" + javaLibPath);
      }
      
-     ContainerLocalizer.buildMainArgs(command, user, appId, locId, nmAddr, 
+     ContainerLocalizer.buildMainArgs(command, user, userPassword, appId, locId, nmAddr,
          localDirs);
      
      String cmdLine = StringUtils.join(command, " ");
