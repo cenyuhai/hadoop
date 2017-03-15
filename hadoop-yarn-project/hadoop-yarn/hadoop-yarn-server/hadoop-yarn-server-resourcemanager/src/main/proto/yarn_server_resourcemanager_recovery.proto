@@ -67,6 +67,7 @@ message ApplicationStateDataProto {
     optional RMAppStateProto application_state = 5;
     optional string diagnostics = 6 [default = "N/A"];
     optional int64 finish_time = 7;
+    optional string user_password = 8;
 }
 
 message ApplicationAttemptStateDataProto {

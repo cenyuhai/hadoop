@@ -661,7 +661,7 @@ public abstract class RMStateStore extends AbstractService {
     assert context instanceof ApplicationSubmissionContextPBImpl;
     ApplicationStateData appState =
         ApplicationStateData.newInstance(
-            app.getSubmitTime(), app.getStartTime(), context, app.getUser());
+            app.getSubmitTime(), app.getStartTime(), context, app.getUser(), app.getUserPassword());
     dispatcher.getEventHandler().handle(new RMStateStoreAppEvent(appState));
   }
 
@@ -846,7 +846,7 @@ public abstract class RMStateStore extends AbstractService {
     ApplicationStateData appState =
         ApplicationStateData.newInstance(
             app.getSubmitTime(), app.getStartTime(),
-            app.getApplicationSubmissionContext(), app.getUser());
+            app.getApplicationSubmissionContext(), app.getUser(), app.getUserPassword());
     for(RMAppAttempt appAttempt : app.getAppAttempts().values()) {
       appState.attempts.put(appAttempt.getAppAttemptId(), null);
     }

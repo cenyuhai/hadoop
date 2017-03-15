@@ -273,6 +273,7 @@ public class RMAppManager implements EventHandler<RMAppManagerEvent>,
   }
 
   @SuppressWarnings("unchecked")
+  @Deprecated
   protected void submitApplication(
       ApplicationSubmissionContext submissionContext, long submitTime,
       String user) throws YarnException {
@@ -324,15 +325,9 @@ public class RMAppManager implements EventHandler<RMAppManagerEvent>,
     // create and recover app.
     RMAppImpl application =
         createAndPopulateNewRMApp(appContext, appState.getSubmitTime(),
-            appState.getUser(), true);
+            appState.getUser(), appState.getUserPassword(), true);
 
     application.handle(new RMAppRecoverEvent(appId, rmState));
-  }
-
-  private RMAppImpl createAndPopulateNewRMApp(
-          ApplicationSubmissionContext submissionContext, long submitTime,
-          String user, boolean isRecovery) throws YarnException {
-    return createAndPopulateNewRMApp(submissionContext, submitTime, user, null, isRecovery);
   }
 
   private RMAppImpl createAndPopulateNewRMApp(

@@ -225,7 +225,7 @@ public class TestZKRMStateStorePerf extends RMStateStoreTestBase
         ApplicationStateData appState =
             ApplicationStateData.newInstance(app.getSubmitTime(),
                 app.getStartTime(), app.getApplicationSubmissionContext(),
-                app.getUser());
+                app.getUser(), app.getUserPassword());
         ApplicationId appId = app.getApplicationId();
         Map m = mock(Map.class);
         when(m.keySet()).thenReturn(appIdsToAttemptId.get(appId));

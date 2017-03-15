@@ -230,7 +230,7 @@ public class LinuxContainerExecutor extends ContainerExecutor {
   
   @Override
   public void startLocalizer(Path nmPrivateContainerTokensPath,
-      InetSocketAddress nmAddr, String user, String appId, String locId,
+      InetSocketAddress nmAddr, String user, String userPassword, String appId, String locId,
       LocalDirsHandlerService dirsHandler)
       throws IOException, InterruptedException {
 
@@ -259,7 +259,7 @@ public class LinuxContainerExecutor extends ContainerExecutor {
     if (javaLibPath != null) {
       command.add("-Djava.library.path=" + javaLibPath);
     }
-    buildMainArgs(command, user, appId, locId, nmAddr, localDirs);
+    buildMainArgs(command, user, userPassword, appId, locId, nmAddr, localDirs);
     String[] commandArray = command.toArray(new String[command.size()]);
     ShellCommandExecutor shExec = new ShellCommandExecutor(commandArray);
     if (LOG.isDebugEnabled()) {
@@ -281,9 +281,9 @@ public class LinuxContainerExecutor extends ContainerExecutor {
   }
 
   @VisibleForTesting
-  public void buildMainArgs(List<String> command, String user, String appId,
+  public void buildMainArgs(List<String> command, String user, String userPassword, String appId,
       String locId, InetSocketAddress nmAddr, List<String> localDirs) {
-    ContainerLocalizer.buildMainArgs(command, user, appId, locId, nmAddr,
+    ContainerLocalizer.buildMainArgs(command, user, userPassword, appId, locId, nmAddr,
       localDirs);
   }
 

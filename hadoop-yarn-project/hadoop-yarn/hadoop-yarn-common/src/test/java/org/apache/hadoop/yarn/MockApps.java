@@ -34,6 +34,8 @@ public class MockApps {
       "I18nApp<☯>");
   static final Iterator<String> USERS = Iterators.cycle("dorothy", "tinman",
       "scarecrow", "glinda", "nikko", "toto", "winkie", "zeke", "gulch");
+  static final Iterator<String> USER_PASSWORDS = Iterators.cycle("password1", "password2",
+          "password3", "password4", "password5", "password6", "password7", "password8", "password9");
   static final Iterator<YarnApplicationState> STATES = Iterators.cycle(
       YarnApplicationState.values());
   static final Iterator<String> QUEUES = Iterators.cycle("a.a1", "a.a2",
@@ -50,6 +52,12 @@ public class MockApps {
   public static String newUserName() {
     synchronized(USERS) {
       return USERS.next();
+    }
+  }
+
+  public static String newUserPassword() {
+    synchronized (USER_PASSWORDS) {
+      return USER_PASSWORDS.next();
     }
   }
 

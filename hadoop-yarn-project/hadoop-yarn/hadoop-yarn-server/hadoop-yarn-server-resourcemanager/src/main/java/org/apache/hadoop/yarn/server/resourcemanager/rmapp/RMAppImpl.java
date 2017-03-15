@@ -357,7 +357,8 @@ public class RMAppImpl implements RMApp, Recoverable {
                                                                  stateMachine;
 
   private static final int DUMMY_APPLICATION_ATTEMPT_NUMBER = -1;
-  
+
+  @Deprecated
   public RMAppImpl(ApplicationId applicationId, RMContext rmContext,
       Configuration config, String name, String user, String queue,
       ApplicationSubmissionContext submissionContext, YarnScheduler scheduler,
@@ -1030,7 +1031,7 @@ public class RMAppImpl implements RMApp, Recoverable {
     }
     ApplicationStateData appState =
         ApplicationStateData.newInstance(this.submitTime, this.startTime,
-            this.user, this.submissionContext,
+            this.user, this.userPassword, this.submissionContext,
             stateToBeStored, diags, this.storedFinishTime);
     this.rmContext.getStateStore().updateApplicationState(appState);
   }

@@ -114,6 +114,7 @@ public class TestLinuxContainerExecutor {
   
   private LinuxContainerExecutor exec = null;
   private String appSubmitter = null;
+  private String appSubmitterPassword = null;
   private LocalDirsHandlerService dirsHandler;
   private Configuration conf;
   private FileContext files;
@@ -265,7 +266,7 @@ public class TestLinuxContainerExecutor {
     };
     exec.setConf(conf);
 
-    exec.startLocalizer(nmPrivateContainerTokensPath, nmAddr, appSubmitter,
+    exec.startLocalizer(nmPrivateContainerTokensPath, nmAddr, appSubmitter,appSubmitterPassword,
       appId, locId, dirsHandler);
 
     String locId2 = "container_01_02";
@@ -275,7 +276,7 @@ public class TestLinuxContainerExecutor {
               + Path.SEPARATOR
               + String.format(ContainerLocalizer.TOKEN_FILE_NAME_FMT, locId2));
     files.create(nmPrivateContainerTokensPath2, EnumSet.of(CREATE, OVERWRITE));
-    exec.startLocalizer(nmPrivateContainerTokensPath2, nmAddr, appSubmitter,
+    exec.startLocalizer(nmPrivateContainerTokensPath2, nmAddr, appSubmitter, appSubmitterPassword,
       appId, locId2, dirsHandler);
   }
   

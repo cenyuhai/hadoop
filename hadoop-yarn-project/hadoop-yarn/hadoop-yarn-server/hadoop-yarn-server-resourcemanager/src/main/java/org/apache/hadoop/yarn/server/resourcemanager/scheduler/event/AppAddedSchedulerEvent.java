@@ -35,11 +35,18 @@ public class AppAddedSchedulerEvent extends SchedulerEvent {
     this(applicationId, queue, user, false, null);
   }
 
+  public AppAddedSchedulerEvent(
+          ApplicationId applicationId, String queue, String user, String userPassword) {
+    this(applicationId, queue, user, userPassword, false, null);
+  }
+
+  @Deprecated
   public AppAddedSchedulerEvent(ApplicationId applicationId, String queue,
       String user, ReservationId reservationID) {
     this(applicationId, queue, user, false, reservationID);
   }
 
+  @Deprecated
   public AppAddedSchedulerEvent(ApplicationId applicationId, String queue,
                                 String user, boolean isAppRecovering, ReservationId reservationID) {
     this(applicationId, queue, user, null, isAppRecovering, reservationID);

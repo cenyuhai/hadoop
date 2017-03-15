@@ -119,36 +119,36 @@ public class FairSchedulerTestBase {
    * scheduler.
    */
   protected ApplicationAttemptId createSchedulingRequest(
-      int memory, String queueId, String userId) {
-    return createSchedulingRequest(memory, queueId, userId, 1);
+      int memory, String queueId, String userId, String userPassword) {
+    return createSchedulingRequest(memory, queueId, userId, userPassword, 1);
   }
 
   protected ApplicationAttemptId createSchedulingRequest(
-      int memory, int vcores, String queueId, String userId) {
-    return createSchedulingRequest(memory, vcores, queueId, userId, 1);
+      int memory, int vcores, String queueId, String userId, String userPassword) {
+    return createSchedulingRequest(memory, vcores, queueId, userId, userPassword, 1);
   }
 
   protected ApplicationAttemptId createSchedulingRequest(
-      int memory, String queueId, String userId, int numContainers) {
-    return createSchedulingRequest(memory, queueId, userId, numContainers, 1);
+      int memory, String queueId, String userId, String userPassword, int numContainers) {
+    return createSchedulingRequest(memory, queueId, userId, userPassword, numContainers, 1);
   }
 
   protected ApplicationAttemptId createSchedulingRequest(
-      int memory, int vcores, String queueId, String userId, int numContainers) {
-    return createSchedulingRequest(memory, vcores, queueId, userId, numContainers, 1);
+      int memory, int vcores, String queueId, String userId, String userPassword, int numContainers) {
+    return createSchedulingRequest(memory, vcores, queueId, userId, userPassword, numContainers, 1);
   }
 
   protected ApplicationAttemptId createSchedulingRequest(
-      int memory, String queueId, String userId, int numContainers, int priority) {
-    return createSchedulingRequest(memory, 1, queueId, userId, numContainers,
+      int memory, String queueId, String userId, String userPassword, int numContainers, int priority) {
+    return createSchedulingRequest(memory, 1, queueId, userId, userPassword, numContainers,
         priority);
   }
 
   protected ApplicationAttemptId createSchedulingRequest(
-      int memory, int vcores, String queueId, String userId, int numContainers,
+      int memory, int vcores, String queueId, String userId, String userPassword, int numContainers,
       int priority) {
     ApplicationAttemptId id = createAppAttemptId(this.APP_ID++, this.ATTEMPT_ID++);
-    scheduler.addApplication(id.getApplicationId(), queueId, userId, false);
+    scheduler.addApplication(id.getApplicationId(), queueId, userId, userPassword, false);
     // This conditional is for testAclSubmitApplication where app is rejected
     // and no app is added.
     if (scheduler.getSchedulerApplications().containsKey(id.getApplicationId())) {
@@ -172,10 +172,10 @@ public class FairSchedulerTestBase {
   }
   
   protected ApplicationAttemptId createSchedulingRequest(String queueId,
-      String userId, List<ResourceRequest> ask) {
+      String userId, String userPassword, List<ResourceRequest> ask) {
     ApplicationAttemptId id = createAppAttemptId(this.APP_ID++,
         this.ATTEMPT_ID++);
-    scheduler.addApplication(id.getApplicationId(), queueId, userId, false);
+    scheduler.addApplication(id.getApplicationId(), queueId, userId, userPassword, false);
     // This conditional is for testAclSubmitApplication where app is rejected
     // and no app is added.
     if (scheduler.getSchedulerApplications().containsKey(id.getApplicationId())) {
@@ -216,15 +216,15 @@ public class FairSchedulerTestBase {
   }
 
   protected void createApplicationWithAMResource(ApplicationAttemptId attId,
-      String queue, String user, Resource amResource) {
+      String queue, String user, String userPassword, Resource amResource) {
     RMContext rmContext = resourceManager.getRMContext();
     RMApp rmApp = new RMAppImpl(attId.getApplicationId(), rmContext, conf,
-        null, null, null, ApplicationSubmissionContext.newInstance(null, null,
+        null, null, null, null, ApplicationSubmissionContext.newInstance(null, null,
         null, null, null, false, false, 0, amResource, null), null, null,
         0, null, null, null);
     rmContext.getRMApps().put(attId.getApplicationId(), rmApp);
     AppAddedSchedulerEvent appAddedEvent = new AppAddedSchedulerEvent(
-        attId.getApplicationId(), queue, user);
+        attId.getApplicationId(), queue, user, userPassword);
     scheduler.handle(appAddedEvent);
     AppAttemptAddedSchedulerEvent attempAddedEvent =
         new AppAttemptAddedSchedulerEvent(attId, false);

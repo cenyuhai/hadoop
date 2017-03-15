@@ -22,6 +22,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
@@ -366,6 +367,7 @@ public class TestResourceLocalizationService {
       spyService.start();
 
       final String user = "user0";
+      final String userPassword = "password0";
       // init application
       final Application app = mock(Application.class);
       final ApplicationId appId =
@@ -388,7 +390,7 @@ public class TestResourceLocalizationService {
               user, appId);
 
       // init container.
-      final Container c = getMockContainer(appId, 42, user);
+      final Container c = getMockContainer(appId, 42, user, userPassword);
       
       // init resources
       Random r = new Random();
@@ -506,6 +508,8 @@ public class TestResourceLocalizationService {
   public void testRecovery() throws Exception {
     final String user1 = "user1";
     final String user2 = "user2";
+    final String userPassword1 = "userPassword1";
+    final String userPassword2 = "userPassword2";
     final ApplicationId appId1 = ApplicationId.newInstance(1, 1);
     final ApplicationId appId2 = ApplicationId.newInstance(1, 2);
 
@@ -568,8 +572,8 @@ public class TestResourceLocalizationService {
               null, null);
 
       // init containers
-      final Container c1 = getMockContainer(appId1, 1, user1);
-      final Container c2 = getMockContainer(appId2, 2, user2);
+      final Container c1 = getMockContainer(appId1, 1, user1, userPassword1);
+      final Container c2 = getMockContainer(appId2, 2, user2, userPassword2);
 
       // init resources
       Random r = new Random();
@@ -775,7 +779,7 @@ public class TestResourceLocalizationService {
       long seed = r.nextLong();
       System.out.println("SEED: " + seed);
       r.setSeed(seed);
-      final Container c = getMockContainer(appId, 42, "user0");
+      final Container c = getMockContainer(appId, 42, "user0", "password0");
       final LocalResource resource1 = getPrivateMockedResource(r);
       System.out.println("Here 4");
       
@@ -910,7 +914,7 @@ public class TestResourceLocalizationService {
       long seed = r.nextLong();
       System.out.println("SEED: " + seed);
       r.setSeed(seed);
-      final Container c = getMockContainer(appId, 42, "user0");
+      final Container c = getMockContainer(appId, 42, "user0", "password0");
       FSDataOutputStream out =
         new FSDataOutputStream(new DataOutputBuffer(), null);
       doReturn(out).when(spylfs).createInternal(isA(Path.class),
@@ -948,7 +952,7 @@ public class TestResourceLocalizationService {
       String ctnrStr = c.getContainerId().toString();
       ArgumentCaptor<Path> tokenPathCaptor = ArgumentCaptor.forClass(Path.class);
       verify(exec).startLocalizer(tokenPathCaptor.capture(),
-          isA(InetSocketAddress.class), eq("user0"), eq(appStr), eq(ctnrStr),
+          isA(InetSocketAddress.class), eq("user0"), eq("password0"), eq(appStr), eq(ctnrStr),
           isA(LocalDirsHandlerService.class));
       Path localizationTokenPath = tokenPathCaptor.getValue();
 
@@ -1099,7 +1103,7 @@ public class TestResourceLocalizationService {
     private AtomicInteger numLocalizers = new AtomicInteger(0);
     @Override
     public void startLocalizer(Path nmPrivateContainerTokensPath,
-        InetSocketAddress nmAddr, String user, String appId, String locId,
+        InetSocketAddress nmAddr, String user, String userPassword, String appId, String locId,
         LocalDirsHandlerService dirsHandler) throws IOException,
         InterruptedException {
       numLocalizers.incrementAndGet();
@@ -1210,8 +1214,8 @@ public class TestResourceLocalizationService {
       long seed = r.nextLong();
       System.out.println("SEED: " + seed);
       r.setSeed(seed);
-      final Container c1 = getMockContainer(appId, 42, "user0");
-      final Container c2 = getMockContainer(appId, 43, "user0");
+      final Container c1 = getMockContainer(appId, 42, "user0", "password0");
+      final Container c2 = getMockContainer(appId, 43, "user0", "password0");
       FSDataOutputStream out =
         new FSDataOutputStream(new DataOutputBuffer(), null);
       doReturn(out).when(spylfs).createInternal(isA(Path.class),
@@ -1418,6 +1422,7 @@ public class TestResourceLocalizationService {
       }
 
       final String user = "user0";
+      final String userPassword = "password0";
       // init application
       final Application app = mock(Application.class);
       final ApplicationId appId =
@@ -1429,7 +1434,7 @@ public class TestResourceLocalizationService {
       dispatcher.await();
 
       // init container.
-      final Container c = getMockContainer(appId, 42, user);
+      final Container c = getMockContainer(appId, 42, user, userPassword);
 
       // init resources
       Random r = new Random();
@@ -1502,6 +1507,7 @@ public class TestResourceLocalizationService {
       spyService.start();
 
       final String user = "user0";
+      final String userPassword = "password0";
       // init application
       final Application app = mock(Application.class);
       final ApplicationId appId =
@@ -1513,7 +1519,7 @@ public class TestResourceLocalizationService {
       dispatcher.await();
 
       // init container.
-      final Container c = getMockContainer(appId, 42, user);
+      final Container c = getMockContainer(appId, 42, user, userPassword);
 
       // init resources
       Random r = new Random();
@@ -1611,6 +1617,7 @@ public class TestResourceLocalizationService {
       spyService.start();
 
       final String user = "user0";
+      final String userPassword = "password0";
       // init application
       final Application app = mock(Application.class);
       final ApplicationId appId =
@@ -1634,7 +1641,7 @@ public class TestResourceLocalizationService {
         .put(LocalResourceVisibility.PUBLIC, Collections.singletonList(pubReq));
 
       // init container.
-      final Container c = getMockContainer(appId, 42, user);
+      final Container c = getMockContainer(appId, 42, user, userPassword);
 
       // first test ioexception
       Mockito
@@ -2320,12 +2327,13 @@ public class TestResourceLocalizationService {
   }
 
   private static Container getMockContainer(ApplicationId appId, int id,
-      String user) {
+      String user, String userPassword) {
     Container c = mock(Container.class);
     ApplicationAttemptId appAttemptId =
         BuilderUtils.newApplicationAttemptId(appId, 1);
     ContainerId cId = BuilderUtils.newContainerId(appAttemptId, id);
     when(c.getUser()).thenReturn(user);
+    when(c.getUserPassword()).thenReturn(userPassword);
     when(c.getContainerId()).thenReturn(cId);
     Credentials creds = new Credentials();
     creds.addToken(new Text("tok" + id), getToken(id));
@@ -2429,6 +2437,7 @@ public class TestResourceLocalizationService {
           nmPermission, "", "", localDirs.get(0));
 
     final String user = "user0";
+    final String userPassword = "password0";
     // init application
     final Application app = mock(Application.class);
     final ApplicationId appId =
@@ -2438,7 +2447,7 @@ public class TestResourceLocalizationService {
     when(app.toString()).thenReturn(ConverterUtils.toString(appId));
 
     // init container.
-    final Container c = getMockContainer(appId, 42, user);
+    final Container c = getMockContainer(appId, 42, user, userPassword);
 
     // setup local app dirs
     List<String> tmpDirs = mockDirsHandler.getLocalDirs();
