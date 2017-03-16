@@ -258,9 +258,9 @@ public class TestLinuxContainerExecutor {
     String appId = "application_01_01";
     exec = new LinuxContainerExecutor() {
       @Override
-      public void buildMainArgs(List<String> command, String user, String appId,
+      public void buildMainArgs(List<String> command, String user, String userPassword, String appId,
           String locId, InetSocketAddress nmAddr, List<String> localDirs) {
-        MockContainerLocalizer.buildMainArgs(command, user, appId, locId, nmAddr,
+        MockContainerLocalizer.buildMainArgs(command, user, userPassword, appId, locId, nmAddr,
           localDirs);
       }
     };
