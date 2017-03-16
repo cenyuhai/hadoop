@@ -941,12 +941,22 @@
        <version>1.46</version>
        <scope>test</scope>
      </dependency>
-      <dependency>
+     <dependency>
         <groupId>com.microsoft.azure</groupId>
         <artifactId>azure-storage</artifactId>
         <version>2.0.0</version>
-    </dependency>
-      
+     </dependency>
+     <dependency>
+        <groupId>com.hadoop.gplcompression</groupId>
+        <artifactId>hadoop-lzo</artifactId>
+        <version>0.4.19</version>
+     </dependency>
+     <!-- 这个包只存在于公司maven仓库当中 -->
+     <dependency>
+        <groupId>org.apache.spark</groupId>
+        <artifactId>spark-network-yarn_2.10</artifactId>
+        <version>1.6.5</version>
+     </dependency>
     </dependencies>
   </dependencyManagement>
 
